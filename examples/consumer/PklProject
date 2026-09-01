@@ -1,0 +1,7 @@
+amends "pkl:Project"
+
+dependencies {
+  ["openbim.loin"] {
+    uri = "package://openbimrs.github.io/pkl/openbim.loin@0.1.0"
+  }
+}

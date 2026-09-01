@@ -1,0 +1,227 @@
+/// Complete synthetic LOIN authoring example.
+amends "../loin.pkl"
+
+import "../iso23387.pkl" as dt
+
+levelOfInformationNeed {
+  specifications {
+    new Specification {
+      guid = "10000000-0000-0000-0000-000000000010"
+      name = "Architectural wall information"
+      prerequisites = new Prerequisites {
+        guid = "10000000-0000-0000-0000-000000000020"
+        purpose = new Purpose {
+          guid = "10000000-0000-0000-0000-000000000021"
+          items {
+            new PurposeName { value = module.multilingualText("en", "Coordination") }
+            new PurposeDefinition {
+              value = module.multilingualText("en", "Coordinate the wall design")
+            }
+            new PurposeDescription {
+              value = module.multilingualText("en", "Synthetic complete-purpose example")
+            }
+            new PurposeLanguage { value = "en" }
+            new PurposeRegion { value = "DE" }
+            new PurposeReferenceDocument {
+              value = module.reference("10000000-0000-0000-0000-000000000022")
+            }
+            new PurposeDictionaryRef {
+              value = module.reference("10000000-0000-0000-0000-000000000027")
+            }
+          }
+        }
+        milestone = new InformationDeliveryMilestone {
+          guid = "10000000-0000-0000-0000-000000000023"
+          name = module.multilingualText("en", "Detailed design")
+          descriptions { module.multilingualText("en", "Issue for coordination") }
+          referenceDocuments {
+            module.reference("10000000-0000-0000-0000-000000000024")
+          }
+          date = "2026-09-30T12:00:00Z"
+        }
+        providingActor = new Actor {
+          guid = "10000000-0000-0000-0000-000000000025"
+          role = module.multilingualText("en", "Architect")
+          emailAddress = "architect@example.org"
+          firstName = "Ada"
+          lastName = "Architect"
+        }
+        receivingActor = new Actor {
+          guid = "10000000-0000-0000-0000-000000000026"
+          role = module.multilingualText("en", "Engineer")
+        }
+      }
+      perObject {
+        new SpecificationPerObjectType {
+          concept =
+            module.concept("10000000-0000-0000-0000-000000000001", "2026-09-01T00:00:00Z", "Wall")
+          objectType = new dt.ObjectType {
+            subject = new dt.Subject {
+              concept =
+                module.concept(
+                  "10000000-0000-0000-0000-000000000001",
+                  "2026-09-01T00:00:00Z",
+                  "Wall",
+                )
+            }
+          }
+          alphanumericalInformation = new AlphanumericalInformation {
+            guid = "10000000-0000-0000-0000-000000000030"
+            properties {
+              new dt.Property {
+                concept =
+                  module.concept(
+                    "10000000-0000-0000-0000-000000000001",
+                    "2026-09-01T00:00:00Z",
+                    "Wall",
+                  )
+              }
+            }
+            quantityKinds {
+              new dt.QuantityKind {
+                concept =
+                  module.concept(
+                    "10000000-0000-0000-0000-000000000001",
+                    "2026-09-01T00:00:00Z",
+                    "Wall",
+                  )
+                dimensionRef = module.reference("10000000-0000-0000-0000-000000000031")
+              }
+            }
+            groupsOfProperties = new GroupsOfProperties {
+              groups {
+                new dt.GroupOfProperties {
+                  subject = new dt.Subject {
+                    concept =
+                      module.concept(
+                        "10000000-0000-0000-0000-000000000001",
+                        "2026-09-01T00:00:00Z",
+                        "Wall",
+                      )
+                  }
+                  propertyRefs {
+                    module.reference("10000000-0000-0000-0000-000000000032")
+                  }
+                }
+              }
+            }
+            referenceDocuments {
+              new dt.ReferenceDocument {
+                concept =
+                  module.concept(
+                    "10000000-0000-0000-0000-000000000001",
+                    "2026-09-01T00:00:00Z",
+                    "Wall",
+                  )
+                languages { "en" }
+              }
+            }
+            dimensions {
+              new dt.Dimension {
+                concept =
+                  module.concept(
+                    "10000000-0000-0000-0000-000000000001",
+                    "2026-09-01T00:00:00Z",
+                    "Wall",
+                  )
+                exponents { 1; 0; 0; 0; 0; 0; 0 }
+              }
+            }
+            units {
+              new dt.Unit {
+                concept =
+                  module.concept(
+                    "10000000-0000-0000-0000-000000000001",
+                    "2026-09-01T00:00:00Z",
+                    "Wall",
+                  )
+                symbols { module.multilingualText("en", "m") }
+                dimensionRef = module.reference("10000000-0000-0000-0000-000000000033")
+                scale = 1
+                base = 10
+                coefficient = 1
+                offset = 0
+              }
+            }
+          }
+          documentation = new Documentation {
+            guid = "10000000-0000-0000-0000-000000000040"
+            documents {
+              new Document {
+                guid = "10000000-0000-0000-0000-000000000041"
+                name = module.multilingualText("en", "Wall detail")
+                format = new DocumentFormat {
+                  names { module.multilingualText("en", "PDF/A") }
+                  versions { module.multilingualText("en", "2b") }
+                }
+                descriptions { module.multilingualText("en", "Construction detail") }
+                documentType = "drawing"
+                content = "urn:example:wall-detail"
+              }
+            }
+          }
+          geometricalInformation = new GeometricalInformation {
+            guid = "10000000-0000-0000-0000-000000000050"
+            placeholder = false
+            detail = new Detail {
+              shapeAssembly = "SingleObjectSingularShape"
+              shapeRepresentation = "OuterShellAsSingularShape"
+              shapeInfluence = new ShapeInfluence {
+                thresholdDimension = new ThresholdDimension {
+                  threshold = 0.01
+                  unit = new dt.Unit {
+                    concept =
+                      module.concept(
+                        "10000000-0000-0000-0000-000000000001",
+                        "2026-09-01T00:00:00Z",
+                        "Wall",
+                      )
+                    symbols { module.multilingualText("en", "m") }
+                    dimensionRef = module.reference("10000000-0000-0000-0000-000000000051")
+                    scale = 1
+                    base = 10
+                    coefficient = 1
+                    offset = 0
+                  }
+                  definition = module.multilingualText("en", "Minimum represented feature")
+                }
+                insideGeometry = "NoInsideGeometry"
+                connections = "ConnectionsAsPartOfShape"
+                openings = "OpeningsAsPartOfShape"
+                operatingAndClearanceZones = "ZonesAsPartOfShape"
+                features = "FeaturesAsPartOfShape"
+              }
+            }
+            dimensionality = "3D"
+            appearance = "ConceptualAppearance"
+            parametricBehaviour = "Requested"
+            location = new Location {
+              relativeOrAbsolute = "Absolute"
+            }
+          }
+        }
+      }
+      geoReferencing = new GeoReferencing {
+        coordinateReferenceSystem = new CoordinateReferenceSystem {
+          crsType = "ProjectedCRS"
+          datum = new Datum {
+            name = "ETRS89"
+            datumType = new DatumRegistryReference {
+              name = module.multilingualText("en", "EPSG")
+              registryReference = module.reference("10000000-0000-0000-0000-000000000060")
+            }
+          }
+        }
+        modelCoordinateSystems {
+          new ModelCoordinateSystem {
+            isProjected = true
+            firstCoordinate = 500000
+            secondCoordinate = 5600000
+            height = 100
+            unitScale = 1
+          }
+        }
+      }
+    }
+  }
+}

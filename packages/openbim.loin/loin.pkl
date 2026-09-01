@@ -1,0 +1,305 @@
+/// ISO 7817-3 / EN 17412-3 Level of Information Need schema and logic.
+///
+/// Import this module for reusable types, or amend it to author a complete LOIN
+/// configuration. The schema is declarative and uses only Apple Pkl base types.
+open module openbim.loin
+
+import "iso23387.pkl" as dt
+
+/// Creates one ISO 23387 multilingual text value.
+function multilingualText(language_: dt.Language, text_: String): dt.MultiLanguageText = new dt
+  .MultiLanguageText {
+  language = language_
+  text = text_
+}
+
+/// Creates one GUID reference.
+function reference(guid_: dt.Guid): dt.Reference = new dt.Reference {
+  guid = guid_
+}
+
+/// Creates the minimal DT concept identity required at the LOIN boundary.
+function concept(guid_: dt.Guid, created_: dt.DateTime, name_: String): dt.Concept = new dt.Concept {
+  guid = guid_
+  dateOfCreation = created_
+  names {
+    multilingualText("en", name_)
+  }
+  definition = multilingualText("en", name_)
+}
+
+/// Namespace declared by the audited 2024 draft schema.
+const namespace2024 = "https://iso.org/2024/LOIN"
+
+/// Namespace used by known 2022 committee-draft documents.
+const namespace2022 = "https://iso.org/2022/LOIN"
+
+/// Known LOIN draft namespaces, newest first.
+const knownNamespaces = List(namespace2024, namespace2022)
+
+/// True when `namespace` is one of the explicitly supported LOIN namespaces.
+function isKnownNamespace(namespace: String): Boolean = knownNamespaces.contains(namespace)
+
+/// Schema-restricted actor email spelling.
+/// ISO 7817-3's deliberately broad email pattern; this is not an RFC mailbox validator.
+typealias EmailAddress = String(matches(Regex(#"^.*[^@]@.+\..+$"#)))
+
+/// Geometry assembly requirement.
+typealias ShapeAssembly =
+  "NotRequired" | "SingleObjectSingularShape" | "SingleObjectMultipleShapes" | "MultipleObjects"
+
+/// Shape representation requirement.
+typealias ShapeRepresentation =
+  "NotRequired"
+    | "SingleBoundingPrimitive"
+    | "OuterShellAsSingularShape"
+    | "OuterShellAsSeparateShapes"
+
+/// Inside-geometry requirement.
+typealias InsideGeometry =
+  "NotRequired" | "NoInsideGeometry" | "InsideGeometryAsPartOfShape" | "SeparateShapes"
+
+/// Connection-geometry requirement.
+typealias Connections =
+  "NotRequired" | "NoConnections" | "ConnectionsAsPartOfShape" | "SeparateShapes"
+
+/// Opening-geometry requirement.
+typealias Openings = "NotRequired" | "NoOpenings" | "OpeningsAsPartOfShape" | "SeparateShapes"
+
+/// Operating and clearance zone requirement.
+typealias OperatingAndClearanceZones =
+  "NotRequired" | "NoZones" | "ZonesAsPartOfShape" | "SeparateShapes"
+
+/// Feature-geometry requirement.
+typealias Features = "NotRequired" | "NoFeatures" | "FeaturesAsPartOfShape" | "SeparateShapes"
+
+/// Required geometric dimensionality.
+typealias Dimensionality = "NotRequired" | "0D" | "1D" | "2D" | "3D"
+
+/// Required appearance fidelity.
+typealias Appearance =
+  "NotRequired"
+    | "NoAppearanceInformation"
+    | "SymbolicByMapping"
+    | "SingularMaterial"
+    | "MultipleMaterials"
+    | "ConceptualAppearance"
+    | "RealisticAppearance"
+
+/// Parametric-behaviour requirement.
+typealias ParametricBehaviour = "NotRequested" | "Requested"
+
+/// Relative or absolute location requirement.
+typealias RelativeOrAbsolute = "NotDefined" | "Absolute" | "Relative"
+
+/// Coordinate reference system kind.
+typealias CoordinateReferenceSystemKind =
+  "NotRequired" | "ProjectedCRS" | "EngineeringCRS" | "GeographicCRS"
+
+/// One ordered branch of the repeating Purpose choice.
+abstract class PurposeItem {}
+class PurposeName extends PurposeItem {
+  value: dt.MultiLanguageText
+}
+class PurposeDefinition extends PurposeItem {
+  value: dt.MultiLanguageText
+}
+class PurposeReferenceDocument extends PurposeItem {
+  value: dt.Reference
+}
+class PurposeDescription extends PurposeItem {
+  value: dt.MultiLanguageText
+}
+class PurposeLanguage extends PurposeItem {
+  value: dt.Language
+}
+class PurposeRegion extends PurposeItem {
+  value: String
+}
+class PurposeDictionaryRef extends PurposeItem {
+  value: dt.Reference
+}
+
+/// LOIN PurposeType. At least one choice item is required.
+class Purpose {
+  guid: dt.Guid
+  items: Listing<PurposeItem>(isNotEmpty)
+}
+
+/// LOIN ActorType.
+class Actor {
+  guid: dt.Guid
+  role: dt.MultiLanguageText
+  description: dt.MultiLanguageText? = null
+  emailAddress: EmailAddress? = null
+  firstName: String? = null
+  middleName: String? = null
+  lastName: String? = null
+  affiliation: String? = null
+}
+
+/// Information-delivery milestone.
+class InformationDeliveryMilestone {
+  guid: dt.Guid
+  name: dt.MultiLanguageText
+  descriptions: Listing<dt.MultiLanguageText> = new {}
+  referenceDocuments: Listing<dt.Reference> = new {}
+  date: dt.DateTime? = null
+}
+
+/// Required purpose, milestone, and actor context for a specification.
+class Prerequisites {
+  guid: dt.Guid
+  purpose: Purpose
+  milestone: InformationDeliveryMilestone
+  providingActor: Actor
+  receivingActor: Actor
+}
+
+/// Repeating property groups and their references.
+class GroupsOfProperties {
+  groups: Listing<dt.GroupOfProperties> = new {}
+  references: Listing<dt.Reference> = new {}
+}
+
+/// Alphanumerical information requirement.
+class AlphanumericalInformation {
+  guid: dt.Guid
+  properties: Listing<dt.Property> = new {}
+  quantityKinds: Listing<dt.QuantityKind> = new {}
+  groupsOfProperties: GroupsOfProperties? = null
+  referenceDocuments: Listing<dt.ReferenceDocument> = new {}
+  dimensions: Listing<dt.Dimension> = new {}
+  units: Listing<dt.Unit> = new {}
+}
+
+/// Required document format names and versions plus optional specifications.
+class DocumentFormat {
+  names: Listing<dt.MultiLanguageText>(isNotEmpty)
+  versions: Listing<dt.MultiLanguageText>(isNotEmpty)
+  specifications: Listing<dt.Reference> = new {}
+}
+
+/// One documentation requirement.
+class Document {
+  guid: dt.Guid
+  name: dt.MultiLanguageText
+  format: DocumentFormat
+  referenceDocuments: Listing<dt.Reference> = new {}
+  descriptions: Listing<dt.MultiLanguageText> = new {}
+  documentType: String? = null
+  form: String? = null
+  content: String? = null
+}
+
+/// Documentation requirement set.
+class Documentation {
+  guid: dt.Guid
+  documents: Listing<Document> = new {}
+}
+
+/// Numeric threshold, unit, and multilingual definition.
+class ThresholdDimension {
+  threshold: Number
+  unit: dt.Unit
+  definition: dt.MultiLanguageText
+}
+
+/// Shape influences on geometrical detail.
+class ShapeInfluence {
+  thresholdDimension: ThresholdDimension? = null
+  insideGeometry: InsideGeometry? = null
+  connections: Connections? = null
+  openings: Openings? = null
+  operatingAndClearanceZones: OperatingAndClearanceZones? = null
+  features: Features? = null
+}
+
+/// Geometrical detail requirement.
+class Detail {
+  dictionary: dt.Reference? = null
+  shapeAssembly: ShapeAssembly? = null
+  shapeRepresentation: ShapeRepresentation? = null
+  shapeInfluence: ShapeInfluence? = null
+}
+
+/// Geometrical information requirement.
+class GeometricalInformation {
+  guid: dt.Guid
+  placeholder: Boolean? = null
+  detail: Detail? = null
+  dimensionality: Dimensionality? = null
+  appearance: Appearance? = null
+  parametricBehaviour: ParametricBehaviour? = null
+  location: Location? = null
+}
+
+/// One per-object specification with ISO 23387 concept and object type.
+class SpecificationPerObjectType {
+  concept: dt.Concept
+  objectType: dt.ObjectType
+  alphanumericalInformation: AlphanumericalInformation? = null
+  documentation: Documentation? = null
+  geometricalInformation: GeometricalInformation? = null
+}
+
+/// Datum registry identity and optional reference.
+class DatumRegistryReference {
+  name: dt.MultiLanguageText
+  descriptions: Listing<dt.MultiLanguageText> = new {}
+  registryReference: dt.Reference? = null
+}
+
+/// Horizontal or vertical datum.
+class Datum {
+  name: String
+  datumType: DatumRegistryReference
+}
+
+/// Coordinate reference system with required kind and datum.
+class CoordinateReferenceSystem {
+  crsType: CoordinateReferenceSystemKind
+  datum: Datum
+  verticalDatum: Datum? = null
+}
+
+/// One model-coordinate-system state.
+class ModelCoordinateSystem {
+  isProjected: Boolean
+  firstCoordinate: Number
+  secondCoordinate: Number
+  height: Number
+  xAxisAbscissa: Number? = null
+  xAxisOrdinate: Number? = null
+  unitScale: Number? = null
+  horizontalScale: Number? = null
+}
+
+/// Relative or absolute geometrical location.
+class Location {
+  relativeOrAbsolute: RelativeOrAbsolute
+  referenceObject: String? = null
+}
+
+/// Optional specification-level georeferencing state.
+class GeoReferencing {
+  coordinateReferenceSystem: CoordinateReferenceSystem? = null
+  modelCoordinateSystems: Listing<ModelCoordinateSystem> = new {}
+}
+
+/// One named LOIN specification.
+class Specification {
+  guid: dt.Guid
+  name: String
+  prerequisites: Prerequisites
+  perObject: Listing<SpecificationPerObjectType> = new {}
+  geoReferencing: GeoReferencing? = null
+}
+
+/// Complete LOIN document model. At least one specification is required.
+class LevelOfInformationNeed {
+  specifications: Listing<Specification>(isNotEmpty)
+}
+
+/// Root authoring property when this module is amended.
+levelOfInformationNeed: LevelOfInformationNeed = new {}

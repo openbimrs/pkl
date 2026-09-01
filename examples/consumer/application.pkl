@@ -1,0 +1,32 @@
+/// Minimal valid consumer document resolved from the published package.
+amends "@openbim.loin/loin.pkl"
+
+levelOfInformationNeed {
+  specifications {
+    new Specification {
+      guid = "10000000-0000-0000-0000-000000000001"
+      name = "Coordination"
+      prerequisites = new Prerequisites {
+        guid = "10000000-0000-0000-0000-000000000002"
+        purpose = new Purpose {
+          guid = "10000000-0000-0000-0000-000000000003"
+          items {
+            new PurposeName { value = module.multilingualText("en", "Coordination") }
+          }
+        }
+        milestone = new InformationDeliveryMilestone {
+          guid = "10000000-0000-0000-0000-000000000004"
+          name = module.multilingualText("en", "Detailed design")
+        }
+        providingActor = new Actor {
+          guid = "10000000-0000-0000-0000-000000000005"
+          role = module.multilingualText("en", "Architect")
+        }
+        receivingActor = new Actor {
+          guid = "10000000-0000-0000-0000-000000000006"
+          role = module.multilingualText("en", "Engineer")
+        }
+      }
+    }
+  }
+}

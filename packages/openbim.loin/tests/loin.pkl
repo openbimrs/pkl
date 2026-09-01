@@ -1,0 +1,231 @@
+module openbim.loin.tests.loin
+
+amends "pkl:test"
+
+import "pkl:test" as test
+
+import "../examples/basic.pkl" as basic
+import "../iso23387.pkl" as dt
+import "../loin.pkl"
+
+facts {
+  ["known draft namespaces"] {
+    loin.knownNamespaces.length == 2
+    loin.knownNamespaces.first == loin.namespace2024
+    loin.isKnownNamespace(loin.namespace2022)
+    !loin.isKnownNamespace("https://example.invalid/LOIN")
+  }
+
+  ["complete example exercises every LOIN information branch"] {
+    basic.levelOfInformationNeed.specifications.length == 1
+    let (spec = basic.levelOfInformationNeed.specifications.first)
+      spec.perObject.first.alphanumericalInformation != null
+    let (spec = basic.levelOfInformationNeed.specifications.first)
+      spec.perObject.first.documentation != null
+    let (spec = basic.levelOfInformationNeed.specifications.first)
+      spec.perObject.first.geometricalInformation != null
+    let (spec = basic.levelOfInformationNeed.specifications.first)
+      spec.geoReferencing != null
+    basic.levelOfInformationNeed.specifications.first.prerequisites.purpose.items.length == 7
+  }
+
+  ["reference emptiness is explicit"] {
+    (new dt.Reference {}).isEmpty()
+    !(loin.reference("10000000-0000-0000-0000-000000000001")).isEmpty()
+  }
+
+  ["lexical contracts reject invalid values"] {
+    test.catchOrNull(() -> (new dt.Reference { guid = "not-a-guid" }).guid) != null
+    test.catchOrNull(() ->
+      (new dt.MultiLanguageText { language = "bad_language"; text = "x" }).language
+    ) != null
+    test.catchOrNull(() ->
+      (
+        new loin.Actor {
+          guid = "10000000-0000-0000-0000-000000000001"
+          role = loin.multilingualText("en", "Architect")
+          emailAddress = "missing-at.example"
+        }
+      ).emailAddress
+    ) != null
+    // The schema's pattern is intentionally broader than RFC mailbox syntax.
+    (
+      new loin.Actor {
+        guid = "10000000-0000-0000-0000-000000000002"
+        role = loin.multilingualText("en", "Coordinator")
+        emailAddress = "coord@internal@example.org"
+      }
+    ).emailAddress == "coord@internal@example.org"
+  }
+
+  ["XML Schema dateTime boundaries"] {
+    loin
+      .concept(
+        "10000000-0000-0000-0000-000000000010",
+        "2024-02-29T24:00:00.000+14:00",
+        "Leap boundary",
+      )
+      .dateOfCreation == "2024-02-29T24:00:00.000+14:00"
+    loin
+      .concept(
+        "10000000-0000-0000-0000-000000000011",
+        "-0001-12-31T23:59:59",
+        "Negative year",
+      )
+      .dateOfCreation == "-0001-12-31T23:59:59"
+    test.catchOrNull(() ->
+      loin
+        .concept(
+          "10000000-0000-0000-0000-000000000012",
+          "2023-02-29T00:00:00Z",
+          "Invalid non-leap day",
+        )
+        .dateOfCreation
+    ) != null
+    test.catchOrNull(() ->
+      loin
+        .concept(
+          "10000000-0000-0000-0000-000000000013",
+          "2024-01-01T24:00:01Z",
+          "Invalid end-of-day time",
+        )
+        .dateOfCreation
+    ) != null
+    test.catchOrNull(() ->
+      loin
+        .concept(
+          "10000000-0000-0000-0000-000000000014",
+          "2024-01-01T00:00:00+14:01",
+          "Invalid timezone",
+        )
+        .dateOfCreation
+    ) != null
+    test.catchOrNull(() ->
+      loin
+        .concept(
+          "10000000-0000-0000-0000-000000000015",
+          "0000-01-01T00:00:00Z",
+          "Invalid year zero",
+        )
+        .dateOfCreation
+    ) != null
+  }
+
+  ["all closed-vocabulary wire values are accepted"] {
+    List(
+      "NotRequired",
+      "SingleObjectSingularShape",
+      "SingleObjectMultipleShapes",
+      "MultipleObjects",
+    ).every((value) -> (new loin.Detail { shapeAssembly = value }).shapeAssembly == value)
+    List(
+      "NotRequired",
+      "SingleBoundingPrimitive",
+      "OuterShellAsSingularShape",
+      "OuterShellAsSeparateShapes",
+    )
+      .every((value) ->
+        (new loin.Detail { shapeRepresentation = value }).shapeRepresentation == value
+      )
+    List("NotRequired", "NoInsideGeometry", "InsideGeometryAsPartOfShape", "SeparateShapes")
+      .every((value) -> (new loin.ShapeInfluence { insideGeometry = value }).insideGeometry == value)
+    List("NotRequired", "NoConnections", "ConnectionsAsPartOfShape", "SeparateShapes")
+      .every((value) -> (new loin.ShapeInfluence { connections = value }).connections == value)
+    List("NotRequired", "NoOpenings", "OpeningsAsPartOfShape", "SeparateShapes")
+      .every((value) -> (new loin.ShapeInfluence { openings = value }).openings == value)
+    List("NotRequired", "NoZones", "ZonesAsPartOfShape", "SeparateShapes")
+      .every((value) ->
+        (new loin.ShapeInfluence { operatingAndClearanceZones = value }).operatingAndClearanceZones
+          == value
+      )
+    List("NotRequired", "NoFeatures", "FeaturesAsPartOfShape", "SeparateShapes")
+      .every((value) -> (new loin.ShapeInfluence { features = value }).features == value)
+    List("NotRequired", "0D", "1D", "2D", "3D")
+      .every((value) ->
+        (
+          new loin.GeometricalInformation {
+            guid = "10000000-0000-0000-0000-000000000001"
+            dimensionality = value
+          }
+        ).dimensionality == value
+      )
+    List(
+      "NotRequired",
+      "NoAppearanceInformation",
+      "SymbolicByMapping",
+      "SingularMaterial",
+      "MultipleMaterials",
+      "ConceptualAppearance",
+      "RealisticAppearance",
+    )
+      .every((value) ->
+        (
+          new loin.GeometricalInformation {
+            guid = "10000000-0000-0000-0000-000000000001"
+            appearance = value
+          }
+        ).appearance == value
+      )
+    List("NotRequested", "Requested")
+      .every((value) ->
+        (
+          new loin.GeometricalInformation {
+            guid = "10000000-0000-0000-0000-000000000001"
+            parametricBehaviour = value
+          }
+        ).parametricBehaviour == value
+      )
+    List("NotDefined", "Absolute", "Relative")
+      .every((value) ->
+        (new loin.Location { relativeOrAbsolute = value }).relativeOrAbsolute == value
+      )
+    List("NotRequired", "ProjectedCRS", "EngineeringCRS", "GeographicCRS")
+      .every((value) ->
+        (
+          new loin.CoordinateReferenceSystem {
+            crsType = value
+            datum = new loin.Datum {
+              name = "Datum"
+              datumType = new loin.DatumRegistryReference {
+                name = loin.multilingualText("en", "Datum")
+              }
+            }
+          }
+        ).crsType == value
+      )
+  }
+
+  ["closed vocabularies reject unknown wire values"] {
+    test.catchOrNull(() -> (new loin.Detail { shapeAssembly = "FutureShape" }).shapeAssembly)
+      != null
+    test.catchOrNull(() -> (new loin.CoordinateReferenceSystem { crsType = "LocalCRS" }).crsType)
+      != null
+  }
+
+  ["schema cardinalities are enforced"] {
+    test.catchOrNull(() -> (new loin.LevelOfInformationNeed { specifications {} }).specifications)
+      != null
+    test.catchOrNull(() -> (new loin.Purpose { items {} }).items) != null
+    test.catchOrNull(() ->
+      (
+        new loin.DocumentFormat {
+          names { loin.multilingualText("en", "PDF") }
+          versions {}
+        }
+      ).versions
+    ) != null
+    test.catchOrNull(() ->
+      (
+        new dt.Dimension {
+          concept =
+            loin.concept(
+              "10000000-0000-0000-0000-000000000001",
+              "2026-09-01T00:00:00Z",
+              "Length",
+            )
+          exponents { 1; 0; 0; 0; 0; 0 }
+        }
+      ).exponents
+    ) != null
+  }
+}

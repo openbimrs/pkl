@@ -1,0 +1,230 @@
+/// Minimal ISO 23387 boundary required by the LOIN schema.
+///
+/// This module deliberately does not claim complete ISO 23387 coverage. It owns
+/// the lexical and complex-type surface that ISO 7817-3 uses from ISO 23387; a future
+/// `openbim.dt` package can replace this boundary without changing LOIN-owned
+/// classes.
+module openbim.iso23387
+
+/// ISO 23387 GUID lexical form.
+typealias Guid =
+  String(
+    matches(
+      Regex(#"^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"#),
+    ),
+  )
+
+/// XML Schema `language` lexical form after whitespace collapsing.
+typealias Language = String(matches(Regex(#"^[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*$"#)))
+
+/// XML Schema `dateTime` spelling retained by the schema layer.
+typealias DateTime = String((it) -> isXsDateTime(it))
+
+local const function isDigits(value: String): Boolean =
+  !value.isEmpty && value.matches(Regex(#"^[0-9]+$"#))
+
+local const function isXsDate(value: String): Boolean =
+  let (unsigned = if (value.startsWith("-")) value.substring(1, value.length) else value)
+  let (parts = unsigned.split("-"))
+    if (parts.length != 3)
+      false
+    else
+      let (year = parts[0])
+      let (monthText = parts[1])
+      let (dayText = parts[2])
+        if (
+          year.length < 4
+            || (year.length > 4 && year.startsWith("0"))
+            || !isDigits(year)
+            || year.toInt() == 0
+            || monthText.length != 2
+            || dayText.length != 2
+            || !isDigits(monthText)
+            || !isDigits(dayText)
+        )
+          false
+        else
+          let (month = monthText.toInt())
+          let (day = dayText.toInt())
+          let (yearMod400 = year.toInt() % 400)
+          let (leap = yearMod400 % 4 == 0 && (yearMod400 % 100 != 0 || yearMod400 == 0))
+          let (
+            maxDay =
+              if (List(1, 3, 5, 7, 8, 10, 12).contains(month))
+                31
+              else if (List(4, 6, 9, 11).contains(month))
+                30
+              else if (month == 2)
+                if (leap) 29 else 28
+              else
+                0
+          )
+            day >= 1 && day <= maxDay
+
+local const function isXsTime(value: String): Boolean =
+  let (parts = value.split(":"))
+    if (parts.length != 3)
+      false
+    else
+      let (hourText = parts[0])
+      let (minuteText = parts[1])
+      let (secondParts = parts[2].split("."))
+        if (
+          hourText.length != 2
+            || minuteText.length != 2
+            || !isDigits(hourText)
+            || !isDigits(minuteText)
+            || (secondParts.length != 1 && secondParts.length != 2)
+        )
+          false
+        else
+          let (whole = secondParts[0])
+          let (fraction = if (secondParts.length == 2) secondParts[1] else null)
+            if (
+              whole.length != 2
+                || !isDigits(whole)
+                || (fraction != null && !isDigits(fraction))
+            )
+              false
+            else
+              let (hour = hourText.toInt())
+              let (minute = minuteText.toInt())
+              let (second = whole.toInt())
+                minute <= 59
+                  && second <= 59
+                  && (
+                    hour <= 23
+                      || (
+                        hour == 24
+                          && minute == 0
+                          && second == 0
+                          && (fraction == null || fraction.toInt() == 0)
+                      )
+                  )
+
+local const function isXsTimezone(value: String): Boolean =
+  if (value == "Z")
+    true
+  else if (
+    value.length != 6
+      || (value[0] != "+" && value[0] != "-")
+      || value[3] != ":"
+      || !isDigits(value.substring(1, 3))
+      || !isDigits(value.substring(4, 6))
+  )
+    false
+  else
+    let (hour = value.substring(1, 3).toInt())
+    let (minute = value.substring(4, 6).toInt())
+      hour <= 14 && minute <= 59 && (hour != 14 || minute == 0)
+
+local const function isXsTimeAndZone(value: String): Boolean =
+  let (
+    zoneStart =
+      if (value.endsWith("Z"))
+        value.length - 1
+      else if (
+        value.length >= 6
+          && (value[value.length - 6] == "+" || value[value.length - 6] == "-")
+      )
+        value.length - 6
+      else
+        value.length
+  )
+  let (time = value.substring(0, zoneStart))
+  let (zone = if (zoneStart == value.length) null else value.substring(zoneStart, value.length))
+    isXsTime(time) && (zone == null || isXsTimezone(zone))
+
+local const function isXsDateTime(value: String): Boolean =
+  let (parts = value.split("T"))
+    parts.length == 2 && isXsDate(parts[0]) && isXsTimeAndZone(parts[1])
+
+/// XML Schema decimal value in Pkl's numeric domain.
+typealias Decimal = Number
+
+/// Language-tagged text.
+class MultiLanguageText {
+  language: Language
+  text: String
+}
+
+/// A reference by GUID, URI, or both. Both absent is XSD-valid and preserved.
+open class Reference {
+  guid: Guid? = null
+  uri: String? = null
+
+  function isEmpty(): Boolean = guid == null && uri == null
+}
+
+/// Shared ISO 23387 concept core used at the LOIN boundary.
+open class Concept {
+  guid: Guid
+  dateOfCreation: DateTime
+  names: Listing<MultiLanguageText>(isNotEmpty)
+  definition: MultiLanguageText
+  references: Listing<Reference> = new {}
+}
+
+/// Subject core shared by object types and groups.
+open class Subject {
+  concept: Concept
+  hasPartRefs: Listing<Reference> = new {}
+  isSubtypeOfRef: Reference? = null
+}
+
+/// ISO 23387 object type imported by LOIN.
+open class ObjectType {
+  subject: Subject
+}
+
+/// ISO 23387 property payload. Internals stay extensible at this boundary.
+open class Property {
+  concept: Concept
+  dataType: String? = null
+  symbols: Listing<String> = new {}
+  dimensionRef: Reference? = null
+  unitRefs: Listing<Reference> = new {}
+  quantityKindRefs: Listing<Reference> = new {}
+  dependencyRefs: Listing<Reference> = new {}
+  specializationRef: Reference? = null
+}
+
+/// ISO 23387 quantity kind.
+open class QuantityKind {
+  concept: Concept
+  dimensionRef: Reference
+}
+
+/// ISO 23387 group of properties.
+open class GroupOfProperties {
+  subject: Subject
+  propertyRefs: Listing<Reference>(isNotEmpty)
+}
+
+/// ISO 23387 reference document.
+open class ReferenceDocument {
+  concept: Concept
+  languages: Listing<Language>(isNotEmpty)
+  dateOfPublication: DateTime? = null
+  author: String? = null
+  isbn: String? = null
+  publisher: String? = null
+  uri: String? = null
+}
+
+/// Seven SI base-dimension exponents in Annex E order.
+open class Dimension {
+  concept: Concept
+  exponents: Listing<Decimal>((it) -> it.length == 7)
+}
+
+/// ISO 23387 unit surface consumed by LOIN.
+open class Unit {
+  concept: Concept
+  symbols: Listing<MultiLanguageText> = new {}
+  dimensionRef: Reference
+  scale: Number
+  base: Number
+  coefficient: Number
+  offset: Number
+}

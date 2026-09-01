@@ -1,0 +1,10 @@
+OpenBIM.rs Pkl licensing notice
+
+Copyright (c) 2026 point-grey
+
+Repository-authored work is licensed under AGPL-3.0-or-later. See LICENSE and
+LICENSING.md.
+
+The `openbim.loin` semantic model is informed by historical MIT-licensed work in
+`openbimrs/loin`; its copyright and license notice is preserved in
+`LICENSES/MIT.txt` and in the published package.
