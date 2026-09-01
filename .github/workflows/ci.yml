@@ -23,6 +23,7 @@ jobs:
           printf '%s  %s\n' \
             3180b62da95c0cad1d904e9bb6c5f4a8f9032413c21e53194bb91ff1ee5f3211 \
             /tmp/pkl | sha256sum --check --strict
+          mkdir -p "$HOME/.local/bin"
           install -m 0755 /tmp/pkl "$HOME/.local/bin/pkl"
           printf '%s\n' "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Run package gate

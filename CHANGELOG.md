@@ -8,6 +8,7 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 - Resolve and evaluate the published `openbim.loin@0.1.0` remote consumer in
   the repository gate.
+- Create the Pkl installation directory on fresh CI runners.
 
 ## [0.1.0] - 2026-09-01
 
