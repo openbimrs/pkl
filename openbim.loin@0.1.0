@@ -1,0 +1,18 @@
+{
+  "name": "openbim.loin",
+  "packageUri": "package://openbimrs.github.io/pkl/openbim.loin@0.1.0",
+  "version": "0.1.0",
+  "packageZipUrl": "https://github.com/openbimrs/pkl/releases/download/openbim.loin@0.1.0/openbim.loin@0.1.0.zip",
+  "packageZipChecksums": {
+    "sha256": "3905d855e02fa2adedfedce6999246bbe89fa4df9ca273e3abd07e14d48ca319"
+  },
+  "dependencies": {},
+  "sourceCodeUrlScheme": "https://github.com/openbimrs/pkl/blob/openbim.loin@0.1.0/packages/openbim.loin%{path}#L%{line}-%{endLine}",
+  "sourceCode": "https://github.com/openbimrs/pkl/tree/openbim.loin@0.1.0/packages/openbim.loin",
+  "license": "AGPL-3.0-or-later",
+  "authors": [
+    "OpenBIM.rs contributors <openbimrs@users.noreply.github.com>"
+  ],
+  "issueTracker": "https://github.com/openbimrs/pkl/issues",
+  "description": "Pure Apple Pkl contracts for openBIM Level of Information Need."
+}
