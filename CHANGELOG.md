@@ -4,6 +4,11 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 ## [Unreleased]
 
+### Changed
+
+- Resolve and evaluate the published `openbim.loin@0.1.0` remote consumer in
+  the repository gate.
+
 ## [0.1.0] - 2026-09-01
 
 ### Added

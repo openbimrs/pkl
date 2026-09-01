@@ -72,7 +72,8 @@ levelOfInformationNeed {
 
 `pkl project resolve` records the selected package URI and checksum in
 `PklProject.deps.json`. See `packages/openbim.loin/examples/basic.pkl` for a
-complete configuration and `examples/consumer/` for the remote-dependency form.
+complete configuration and `examples/consumer/` for the resolved and
+gate-verified remote dependency.
 
 ### Develop
 

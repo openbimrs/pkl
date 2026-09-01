@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "resolvedDependencies": {
+    "package://openbimrs.github.io/pkl/openbim.loin@0": {
+      "type": "remote",
+      "uri": "projectpackage://openbimrs.github.io/pkl/openbim.loin@0.1.0",
+      "checksums": {
+        "sha256": "8913b92aab92c53b99e8c8be982a569eec0b76e03ff5a2aa178fe1038380443f"
+      }
+    }
+  }
+}
