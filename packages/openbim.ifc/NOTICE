@@ -1,4 +1,4 @@
-openbim.ifc 0.2.0 includes generated structural catalogs for IFC2x3 TC1,
+openbim.ifc 0.2.1 includes generated structural catalogs for IFC2x3 TC1,
 IFC4 ADD2 TC1, and IFC4X3 ADD2.
 
 Repository-authored Pkl contracts and tooling are licensed under

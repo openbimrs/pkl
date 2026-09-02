@@ -141,7 +141,7 @@ and the [analytic B-rep requirement example](packages/openbim.geometry/examples/
 | Package | Version | Semantic model | XML codec |
 |---|---:|---|---|
 | `openbim.loin` | 0.1.0 | Implemented and tested | Not implemented |
-| `openbim.ifc` | 0.2.0 | Delta-compressed IFC2X3, IFC4, and IFC4X3 structural catalog | Not applicable: schema-as-data |
+| `openbim.ifc` | 0.2.1 | Delta-compressed IFC2X3, IFC4, and IFC4X3 structural catalog | Not applicable: schema-as-data |
 | `openbim.geometry` | 0.1.0 | Implemented and tested | Not applicable: capability vocabulary |
 
 See [`docs/loin-port.md`](docs/loin-port.md) for the audited port map and
