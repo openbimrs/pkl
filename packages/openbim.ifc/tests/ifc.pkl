@@ -48,7 +48,7 @@ facts {
         && reference.externalTypeSystem
           == "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
         && reference.packageCatalogUri.startsWith(
-          "package://openbimrs.github.io/pkl/openbim.ifc@0.2.0#/",
+          "package://openbimrs.github.io/pkl/openbim.ifc@0.2.1#/",
         )
     !ifc4x3.entity("IfcWall").externalTypeSystem.startsWith("package://")
   }

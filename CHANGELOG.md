@@ -20,6 +20,9 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 ### Changed
 
+- Refactored `openbim.ifc` 0.2.1 into a 170-line stable catalog facade over
+  generated name, baseline, delta, and transition modules without changing its
+  release-explicit resolver contract.
 - Resolve and evaluate the published `openbim.loin@0.1.0` remote consumer in
   the repository gate.
 - Create the Pkl installation directory on fresh CI runners.

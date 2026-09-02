@@ -85,11 +85,11 @@ pkl eval packages/openbim.loin/examples/basic.pkl
 pkl project package --output-path build packages/openbim.loin
 ```
 
-
 ## `openbim.ifc`
 
 `openbim.ifc` provides one delta-compressed, release-explicit structural catalog
-for IFC2X3 TC1, IFC4 ADD2 TC1, and IFC4X3 ADD2. Thin version entry points
+for IFC2X3 TC1, IFC4 ADD2 TC1, and IFC4X3 ADD2. Its stable `Catalog.pkl` facade
+composes cohesive generated storage modules; thin version entry points
 reconstruct ancestry and inherited positional slots from direct declarations;
 unknown or release-absent entities fail closed. Canonical rows come from exact
 `openbimrs/ifc` `ifc-schema` exports rather than MCS-authored strings.
@@ -101,7 +101,7 @@ wall = ifc4x3.entity("IfcWall")
 inheritedSlots = wall.attributes
 ```
 
-The package deliberately does not bundle PSD/QTO runtime data in `0.2.0`.
+The package deliberately does not bundle PSD/QTO runtime data in the `0.2.x` line.
 The canonical `ifc-template-catalog` now supplies version-explicit, GUID-bearing
 exports; this package fixes their release-local occurrence and evidence-required
 continuity boundary for later measured ingestion. See

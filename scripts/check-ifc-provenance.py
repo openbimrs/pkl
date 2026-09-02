@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import shutil
 import subprocess
 import sys
@@ -14,7 +15,11 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = ROOT / "packages/openbim.ifc"
 PROVENANCE = PACKAGE / "provenance"
 CATALOGS = PROVENANCE / "catalogs"
-GENERATED = (PACKAGE / "Catalog.pkl", *(PACKAGE / "versions").glob("*.pkl"))
+GENERATED = (
+    PACKAGE / "Catalog.pkl",
+    *(PACKAGE / "internal").glob("*.pkl"),
+    *(PACKAGE / "versions").glob("*.pkl"),
+)
 
 
 def fail(message: str) -> None:
@@ -45,6 +50,14 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def package_version() -> str:
+    project = (PACKAGE / "PklProject").read_text(encoding="utf-8")
+    match = re.search(r'^\s*version = "([0-9]+\.[0-9]+\.[0-9]+)"$', project, re.MULTILINE)
+    if match is None:
+        fail("PklProject has no numeric package version")
+    return match.group(1)
+
+
 def main() -> None:
     source = read_source()
     for name in ("ifc2x3", "ifc4", "ifc4x3"):
@@ -67,21 +80,25 @@ def main() -> None:
                 str(rendered),
                 "--source-commit",
                 source["artifact_commit"],
+                "--package-version",
+                package_version(),
             ],
             cwd=ROOT,
             check=True,
             stdout=subprocess.DEVNULL,
         )
         subprocess.run([pkl, "format", "-w", str(rendered)], check=True)
+        expected_relatives = {path.relative_to(PACKAGE) for path in GENERATED}
         for expected in sorted(GENERATED):
-            candidate = rendered / expected.name
+            relative = expected.relative_to(PACKAGE)
+            candidate = rendered / relative
             if not candidate.is_file() or candidate.read_bytes() != expected.read_bytes():
-                fail(f"generated catalog drift: {expected.name}")
-        extras = {path.name for path in rendered.glob("*.pkl")} - {
-            path.name for path in GENERATED
-        }
+                fail(f"generated catalog drift: {relative}")
+        extras = {
+            path.relative_to(rendered) for path in rendered.rglob("*.pkl")
+        } - expected_relatives
         if extras:
-            fail(f"unexpected generated catalogs: {sorted(extras)}")
+            fail(f"unexpected generated catalogs: {sorted(map(str, extras))}")
 
     print("verified IFC source digests and deterministic Pkl catalogs")
 

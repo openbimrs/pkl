@@ -4,7 +4,7 @@ amends "pkl:Project"
 package {
   name = "openbim.ifc"
   baseUri = "package://openbimrs.github.io/pkl/openbim.ifc"
-  version = "0.2.0"
+  version = "0.2.1"
   packageZipUrl =
     "https://github.com/openbimrs/pkl/releases/download/openbim.ifc@\(version)/openbim.ifc@\(version).zip"
   description = "Delta-compressed Apple Pkl contracts for release-bound IFC structural references."
@@ -21,6 +21,7 @@ package {
   }
   exclude {
     "AGENTS.md"
+    "internal/AGENTS.md"
     "examples/**"
     "provenance/**"
     "tests/**"

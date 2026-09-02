@@ -15,7 +15,7 @@ class Release {
   /// Release-bound IFC identifier. This is domain identity, never package transport.
   externalTypeSystem: String(startsWith("https://"))
   /// Package transport identity for this generated catalog release.
-  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.2.0#/"))
+  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.2.1#/"))
 }
 
 /// Physical storage fact: immediate parent and directly declared positional slots only.
@@ -28,7 +28,7 @@ class DirectEntityDefinition {
 class EntityReference {
   release: ReleaseId
   externalTypeSystem: String(startsWith("https://"))
-  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.2.0#/"))
+  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.2.1#/"))
   name: String(matches(Regex(#"^Ifc[A-Za-z0-9_]+$"#)))
   directSupertype: String?
   directAttributes: List<String>

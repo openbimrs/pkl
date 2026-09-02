@@ -107,7 +107,7 @@ def main() -> None:
         "openbim.ifc",
         "tests/ifc.pkl",
         lambda package: replace_once(
-            package / "Catalog.pkl",
+            package / "internal/Ifc4Data.pkl",
             '  ["IfcWall"] = new ifc.DirectEntityDefinition {\n    parent = "IfcBuildingElement"\n    attributes = List("PredefinedType")',
             '  ["IfcWall"] = new ifc.DirectEntityDefinition {\n    parent = "IfcElement"\n    attributes = List("PredefinedType")',
         ),
@@ -117,7 +117,7 @@ def main() -> None:
         "openbim.ifc",
         "tests/ifc.pkl",
         lambda package: replace_once(
-            package / "Catalog.pkl",
+            package / "internal/Ifc4x3Data.pkl",
             'ifc4x3Removed: List<String> =\n  List(\n    "IfcBeamStandardCase",\n    "IfcBuildingElement",\n    "IfcBuildingElementType",',
             'ifc4x3Removed: List<String> =\n  List(\n    "IfcBeamStandardCase",\n    "IfcBuildingElementType",',
         ),

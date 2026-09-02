@@ -26,6 +26,7 @@ CONSUMER="examples/consumer"
 "$PKL_BIN" test "$LOIN_PACKAGE/tests/loin.pkl"
 "$PKL_BIN" test "$GEOMETRY_PACKAGE/tests/geometry.pkl"
 "$PKL_BIN" test "$IFC_PACKAGE/tests/ifc.pkl"
+python3 scripts/check-ifc-modularity.py
 python3 scripts/check-ifc-provenance.py
 python3 scripts/mutation-gate.py
 
@@ -75,10 +76,10 @@ for artifact in \
   openbim.geometry@0.1.0.sha256 \
   openbim.geometry@0.1.0.zip \
   openbim.geometry@0.1.0.zip.sha256 \
-  openbim.ifc@0.2.0 \
-  openbim.ifc@0.2.0.sha256 \
-  openbim.ifc@0.2.0.zip \
-  openbim.ifc@0.2.0.zip.sha256
+  openbim.ifc@0.2.1 \
+  openbim.ifc@0.2.1.sha256 \
+  openbim.ifc@0.2.1.zip \
+  openbim.ifc@0.2.1.zip.sha256
 do
   test -s "$scratch/package/$artifact"
 done

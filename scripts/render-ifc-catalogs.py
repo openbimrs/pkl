@@ -8,6 +8,8 @@ import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 
+from ifc_catalog_modules import GENERATED_MARKER, write_modules
+
 
 @dataclass(frozen=True)
 class Edition:
@@ -108,7 +110,13 @@ def pkl_mapping(rows: dict[str, tuple[str | None, tuple[str, ...]]]) -> str:
     return "\n".join(pkl_definition(name, direct) for name, direct in rows.items())
 
 
-def render_catalog(editions: tuple[Edition, ...], catalogs: list[dict[str, DirectDefinition]], digests: list[str], source_commit: str) -> str:
+def render_catalog(
+    editions: tuple[Edition, ...],
+    catalogs: list[dict[str, DirectDefinition]],
+    digests: list[str],
+    source_commit: str,
+    package_version: str,
+) -> str:
     directs = catalogs
     baseline = directs[0]
     delta4 = {name: direct for name, direct in directs[1].items() if baseline.get(name) != direct}
@@ -133,10 +141,11 @@ def render_catalog(editions: tuple[Edition, ...], catalogs: list[dict[str, Direc
   typeCount = {edition.type_count}
   sourceUri = "{edition.source_uri}"
   externalTypeSystem = "{edition.external_type_system}"
-  packageCatalogUri = "package://openbimrs.github.io/pkl/openbim.ifc@0.2.0#/releases/{edition.release_id}"
+  packageCatalogUri = "package://openbimrs.github.io/pkl/openbim.ifc@{package_version}#/releases/{edition.release_id}"
 }}''' for edition in editions
     )
-    return f'''/// Generated delta-compressed IFC evolution catalog; do not edit by hand.
+    return f'''{GENERATED_MARKER}
+/// Generated delta-compressed IFC evolution catalog; do not edit by hand.
 /// Source `openbimrs/ifc` commit: {source_commit}
 /// Structural TSV SHA-256: IFC2X3={digests[0]}, IFC4={digests[1]}, IFC4X3={digests[2]}
 module openbim.ifc.Catalog
@@ -260,7 +269,8 @@ function evolutionByName(name_: String): ifc.EntityEvolution =
 
 
 def render_wrapper(edition: Edition, digest: str, source_commit: str) -> str:
-    return f'''/// Thin {edition.label} view over the generated delta-compressed evolution catalog.
+    return f'''{GENERATED_MARKER}
+/// Thin {edition.label} view over the generated delta-compressed evolution catalog.
 /// Source `openbimrs/ifc` commit: {source_commit}; structural TSV SHA-256: {digest}
 module openbim.ifc.versions.{edition.module_name}
 
@@ -280,16 +290,29 @@ def main() -> int:
     parser.add_argument("--source-dir", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--source-commit", required=True)
+    parser.add_argument("--package-version", required=True)
     args = parser.parse_args()
     if len(args.source_commit) != 40 or any(char not in "0123456789abcdef" for char in args.source_commit):
         raise SystemExit("--source-commit must be a full lowercase Git object ID")
+    if not args.package_version or any(char not in "0123456789." for char in args.package_version):
+        raise SystemExit("--package-version must be a numeric semantic version")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     catalogs = [read_catalog(args.source_dir / edition.input_name, edition) for edition in EDITIONS]
     digests = [hashlib.sha256((args.source_dir / edition.input_name).read_bytes()).hexdigest() for edition in EDITIONS]
-    (args.output_dir / "Catalog.pkl").write_text(render_catalog(EDITIONS, catalogs, digests, args.source_commit), encoding="utf-8")
+    monolith = render_catalog(
+        EDITIONS, catalogs, digests, args.source_commit, args.package_version
+    )
+    write_modules(monolith, args.output_dir)
+    versions = args.output_dir / "versions"
+    versions.mkdir(parents=True, exist_ok=True)
     for edition, digest in zip(EDITIONS, digests, strict=True):
-        (args.output_dir / edition.output_name).write_text(render_wrapper(edition, digest, args.source_commit), encoding="utf-8")
-    print(f"wrote Catalog.pkl: union=1006 revisions=1236 direct declarations=1236")
+        (versions / edition.output_name).write_text(
+            render_wrapper(edition, digest, args.source_commit), encoding="utf-8"
+        )
+    print(
+        "wrote modular IFC catalog: modules=9 union=1006 "
+        "revisions=1236 direct declarations=1236"
+    )
     return 0
 
 
