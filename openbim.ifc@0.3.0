@@ -1,0 +1,18 @@
+{
+  "name": "openbim.ifc",
+  "packageUri": "package://openbimrs.github.io/pkl/openbim.ifc@0.3.0",
+  "version": "0.3.0",
+  "packageZipUrl": "https://github.com/openbimrs/pkl/releases/download/openbim.ifc@0.3.0/openbim.ifc@0.3.0.zip",
+  "packageZipChecksums": {
+    "sha256": "299fb1a5c0fd9c287c1f0cca5cf0f32e8e4af412f671468fa5e314ee0c85766c"
+  },
+  "dependencies": {},
+  "sourceCodeUrlScheme": "https://github.com/openbimrs/pkl/blob/openbim.ifc@0.3.0/packages/openbim.ifc%{path}#L%{line}-%{endLine}",
+  "sourceCode": "https://github.com/openbimrs/pkl/tree/openbim.ifc@0.3.0/packages/openbim.ifc",
+  "license": "AGPL-3.0-or-later AND CC-BY-ND-4.0",
+  "authors": [
+    "OpenBIM.rs contributors <openbimrs@users.noreply.github.com>"
+  ],
+  "issueTracker": "https://github.com/openbimrs/pkl/issues",
+  "description": "Delta-compressed Apple Pkl contracts for release-bound IFC entities and official PSD/QTO references."
+}
