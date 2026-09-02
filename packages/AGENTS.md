@@ -5,6 +5,7 @@ Each directory is a self-contained Apple Pkl package project with its own `PklPr
 Current packages:
 
 - `openbim.loin/`: ISO 7817-3 / EN 17412-3 Level of Information Need contracts.
+- `openbim.ifc/`: generated, version-separated IFC structural catalogs and references.
 - `openbim.geometry/`: vendor- and application-neutral geometry capability, requirement, and conformance contracts.
 
 Do not make one package depend on another through relative source imports. Published cross-package relationships use `Project.RemoteDependency` and are locked in `PklProject.deps.json`.

@@ -2,13 +2,13 @@
 module openbim.geometry.capabilities.representation
 
 typealias CapabilityId =
-  "geometry.representation.mesh.triangle"
-    | "geometry.representation.mesh.polygon"
-    | "geometry.representation.curve.analytic"
-    | "geometry.representation.surface.analytic"
-    | "geometry.representation.nurbs.curve"
-    | "geometry.representation.nurbs.surface"
-    | "geometry.representation.brep.topology"
-    | "geometry.representation.brep.exact-result"
-    | "geometry.representation.brep.trimmed-analytic"
-    | "geometry.representation.set-theoretic-solid"
+  "openbim.geometry:representation.mesh.triangle"
+    | "openbim.geometry:representation.mesh.polygon"
+    | "openbim.geometry:representation.curve.analytic"
+    | "openbim.geometry:representation.surface.analytic"
+    | "openbim.geometry:representation.nurbs.curve"
+    | "openbim.geometry:representation.nurbs.surface"
+    | "openbim.geometry:representation.brep.topology"
+    | "openbim.geometry:representation.brep.exact-result"
+    | "openbim.geometry:representation.brep.trimmed-analytic"
+    | "openbim.geometry:representation.set-theoretic-solid"

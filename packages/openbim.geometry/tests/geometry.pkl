@@ -16,31 +16,38 @@ facts {
   }
 
   ["complete triangle mesh claim"] {
-    axiolid.capabilities["geometry.representation.mesh.triangle"].level == "full"
+    axiolid.capabilities["openbim.geometry:representation.mesh.triangle"].level == "full"
   }
 
   ["mesh Boolean remains partial"] {
-    axiolid.capabilities["geometry.boolean.intersection"].level == "partial"
+    axiolid.capabilities["openbim.geometry:boolean.intersection"].level == "partial"
   }
 
   ["clearance remains sampled"] {
-    axiolid.capabilities["geometry.clearance.directional"].exactness.contains("approximate")
+    axiolid.capabilities["openbim.geometry:clearance.directional"].exactness.contains("approximate")
   }
 
   ["unimplemented minimum distance is absent"] {
-    !axiolid.capabilities.containsKey("geometry.distance.minimum")
+    !axiolid.capabilities.containsKey("openbim.geometry:distance.minimum")
   }
   ["unknown capability IDs are rejected"] {
     test.catchOrNull(() ->
-      (new CatalogProbe { claims { ["geometry.unknown"] = "not a capability" } }).claims
+      (new CatalogProbe { claims { ["openbim.geometry:unknown"] = "not a capability" } }).claims
     ) != null
+  }
+
+  ["capability IDs are package-qualified for external contracts"] {
+    analyticBrep.requirements.allOf.first.capability
+      == "openbim.geometry:representation.brep.trimmed-analytic"
+    catalog.allCapabilities.every((id) -> id.startsWith("openbim.geometry:"))
   }
 
   ["analytic B-rep requirements stay representation-specific"] {
     analyticBrep.requirements.allOf.length == 2
     analyticBrep.requirements.allOf.first.capability
-      == "geometry.representation.brep.trimmed-analytic"
-    analyticBrep.requirements.allOf.last.capability == "geometry.topology.geometric-validation"
+      == "openbim.geometry:representation.brep.trimmed-analytic"
+    analyticBrep.requirements.allOf.last.capability
+      == "openbim.geometry:topology.geometric-validation"
   }
 
   ["unsupported precision is rejected"] {

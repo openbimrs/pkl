@@ -1,0 +1,87 @@
+/// RED tests for version-separated IFC structural references.
+module openbim.ifc.tests
+
+amends "pkl:test"
+
+import "pkl:test" as test
+
+import "../ifc.pkl" as ifc
+import "../versions/Ifc2x3.pkl" as ifc2x3
+import "../versions/Ifc4.pkl" as ifc4
+import "../versions/Ifc4x3.pkl" as ifc4x3
+
+facts {
+  ["exact bundled release identities and counts"] {
+    ifc2x3.release.id == "IFC2X3_TC1"
+    ifc2x3.release.entityCount == 653
+    ifc2x3.release.typeCount == 327
+    ifc4.release.id == "IFC4_ADD2_TC1"
+    ifc4.release.entityCount == 776
+    ifc4.release.typeCount == 397
+    ifc4x3.release.id == "IFC4X3_ADD2"
+    ifc4x3.release.entityCount == 876
+    ifc4x3.release.typeCount == 436
+  }
+
+  ["all catalog rows are present"] {
+    ifc2x3.entities.length == ifc2x3.release.entityCount
+    ifc4.entities.length == ifc4.release.entityCount
+    ifc4x3.entities.length == ifc4x3.release.entityCount
+  }
+
+  ["typed entity references preserve their release"] {
+    let (wall2x3 = ifc2x3.entity("IfcWall"))
+      wall2x3.release == "IFC2X3_TC1" && wall2x3.name == "IfcWall"
+    ifc4.entity("IfcWall").release == "IFC4_ADD2_TC1"
+    ifc4x3.entity("IfcWall").release == "IFC4X3_ADD2"
+  }
+
+  ["version-specific inheritance is not substituted"] {
+    ifc4.entity("IfcWall").supertypes.contains("IfcBuildingElement")
+    !ifc4.entity("IfcWall").supertypes.contains("IfcBuiltElement")
+    ifc4x3.entity("IfcWall").supertypes.contains("IfcBuiltElement")
+    !ifc4x3.entity("IfcWall").supertypes.contains("IfcBuildingElement")
+  }
+
+  ["inherited positional attributes remain ordered"] {
+    let (attributes = ifc4.entity("IfcWall").attributes)
+      attributes[0] == "GlobalId"
+        && attributes[1] == "OwnerHistory"
+        && attributes[2] == "Name"
+        && attributes[3] == "Description"
+        && attributes.contains("PredefinedType")
+  }
+
+  ["unknown entities fail closed"] {
+    test.catchOrNull(() -> ifc4.entityByName("IfcDefinitelyNotAnEntity")) != null
+    test.catchOrNull(() -> ifc4x3.entityByName("IfcBuildingElement")) != null
+  }
+
+  ["attribute references validate membership"] {
+    let (
+      reference = new ifc.AttributeReference {
+        entity = ifc4.entity("IfcWall")
+        name = "PredefinedType"
+      }
+    )
+      reference.name == "PredefinedType"
+    test.catchOrNull(() ->
+      (
+        new ifc.AttributeReference {
+          entity = ifc4.entity("IfcWall")
+          name = "NotAnIfcWallAttribute"
+        }
+      ).name
+    ) != null
+  }
+
+  ["template references carry release and container explicitly"] {
+    let (property = ifc4x3.property("Pset_WallCommon", "LoadBearing"))
+      property.release == "IFC4X3_ADD2"
+        && property.container == "Pset_WallCommon"
+        && property.name == "LoadBearing"
+    let (propertySet = ifc4x3.propertySet("Pset_WallCommon"))
+      propertySet.release == "IFC4X3_ADD2"
+        && propertySet.name == "Pset_WallCommon"
+  }
+}

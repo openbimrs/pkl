@@ -11,6 +11,9 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
 - Create the Pkl installation directory on fresh CI runners.
 
 ### Added
+- Added `openbim.ifc` 0.1.0 with exact IFC2X3 TC1, IFC4 ADD2 TC1, and
+  IFC4X3 ADD2 entity catalogs, inheritance closures, inherited attribute order,
+  explicit release references, deterministic provenance, and MCS-ready adapters.
 - Added `openbim.geometry` 0.1.0: a vendor- and application-neutral geometry capability catalog, scoped implementation manifests, downstream requirements, and declarative conformance reports. The initial Axiolid manifest is source-evidenced and deliberately leaves unsupported exact construction, general intersections, minimum distance, and containment absent.
 
 ## [0.1.0] - 2026-09-01

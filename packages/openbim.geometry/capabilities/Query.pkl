@@ -2,13 +2,13 @@
 module openbim.geometry.capabilities.query
 
 typealias CapabilityId =
-  "geometry.distance.minimum"
-    | "geometry.distance.signed"
-    | "geometry.clearance.directional"
-    | "geometry.containment.point-in-solid"
-    | "geometry.intersection.curve-curve"
-    | "geometry.intersection.curve-surface"
-    | "geometry.intersection.surface-surface"
-    | "geometry.intersection.section"
-    | "geometry.projection.point-curve"
-    | "geometry.projection.point-surface"
+  "openbim.geometry:distance.minimum"
+    | "openbim.geometry:distance.signed"
+    | "openbim.geometry:clearance.directional"
+    | "openbim.geometry:containment.point-in-solid"
+    | "openbim.geometry:intersection.curve-curve"
+    | "openbim.geometry:intersection.curve-surface"
+    | "openbim.geometry:intersection.surface-surface"
+    | "openbim.geometry:intersection.section"
+    | "openbim.geometry:projection.point-curve"
+    | "openbim.geometry:projection.point-surface"

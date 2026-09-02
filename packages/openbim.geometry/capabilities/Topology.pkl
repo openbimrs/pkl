@@ -2,9 +2,9 @@
 module openbim.geometry.capabilities.topology
 
 typealias CapabilityId =
-  "geometry.topology.adjacency"
-    | "geometry.topology.manifold-validation"
-    | "geometry.topology.geometric-validation"
-    | "geometry.tessellation.surface"
-    | "geometry.repair.diagnosis"
-    | "geometry.repair.explicit"
+  "openbim.geometry:topology.adjacency"
+    | "openbim.geometry:topology.manifold-validation"
+    | "openbim.geometry:topology.geometric-validation"
+    | "openbim.geometry:tessellation.surface"
+    | "openbim.geometry:repair.diagnosis"
+    | "openbim.geometry:repair.explicit"

@@ -10,7 +10,7 @@ requirements: requirementsSchema.GeometryRequirements = new requirementsSchema.G
   allOf =
     List(
       new requirementsSchema.CapabilityRequirement {
-        capability = "geometry.representation.brep.trimmed-analytic"
+        capability = "openbim.geometry:representation.brep.trimmed-analytic"
         minimumLevel = "full"
         acceptedExactness = List("analytic")
         dimensions = List("3D")
@@ -18,7 +18,7 @@ requirements: requirementsSchema.GeometryRequirements = new requirementsSchema.G
         outputRepresentations = List("brep")
       },
       new requirementsSchema.CapabilityRequirement {
-        capability = "geometry.topology.geometric-validation"
+        capability = "openbim.geometry:topology.geometric-validation"
         minimumLevel = "full"
         acceptedExactness = List("tolerance-bounded", "exact")
         dimensions = List("3D")

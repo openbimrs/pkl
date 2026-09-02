@@ -86,6 +86,25 @@ pkl project package --output-path build packages/openbim.loin
 ```
 
 
+## `openbim.ifc`
+
+`openbim.ifc` provides version-separated structural catalogs for IFC2X3 TC1,
+IFC4 ADD2 TC1, and IFC4X3 ADD2. Entity names are closed Pkl unions; dynamic
+lookups fail closed; each entity carries its complete supertype closure and
+inherited positional attribute order. The generated rows come from exact
+`openbimrs/ifc` `ifc-schema` artifacts rather than MCS-authored strings.
+
+```pkl
+import "@ifc/versions/Ifc4x3.pkl" as ifc4x3
+
+wall = ifc4x3.entity("IfcWall")
+loadBearing = ifc4x3.property("Pset_WallCommon", "LoadBearing")
+```
+
+The package deliberately does not claim complete PSD/QTO coverage. See
+[`docs/ifc-catalogs.md`](docs/ifc-catalogs.md) for provenance and the boundary
+with `openbim.geometry` and Axioval MCS.
+
 ## `openbim.geometry`
 
 `openbim.geometry` is a vendor- and application-neutral geometry-kernel capability
@@ -119,6 +138,7 @@ and the [analytic B-rep requirement example](packages/openbim.geometry/examples/
 | Package | Version | Semantic model | XML codec |
 |---|---:|---|---|
 | `openbim.loin` | 0.1.0 | Implemented and tested | Not implemented |
+| `openbim.ifc` | 0.1.0 | IFC2X3, IFC4, and IFC4X3 structural catalogs | Not applicable: schema-as-data |
 | `openbim.geometry` | 0.1.0 | Implemented and tested | Not applicable: capability vocabulary |
 
 See [`docs/loin-port.md`](docs/loin-port.md) for the audited port map and

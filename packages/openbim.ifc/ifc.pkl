@@ -1,0 +1,57 @@
+/// Neutral, version-explicit references into IFC structural catalogs.
+module openbim.ifc
+
+typealias ReleaseId = "IFC2X3_TC1" | "IFC4_ADD2_TC1" | "IFC4X3_ADD2"
+
+/// Exact identity and provenance boundary for one bundled IFC schema table.
+class Release {
+  id: ReleaseId
+  label: String
+  headerTokens: List<String>(isNotEmpty)
+  entityCount: UInt
+  typeCount: UInt
+  sourceUri: String(startsWith("https://"))
+  /// Package-owned identifier for external names bound to this exact table.
+  catalogTypeSystem: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/"))
+}
+
+/// Structural facts for one entity row. Attributes are inherited-first and in
+/// Part 21 positional order; supertypes are nearest-parent first.
+class EntityDefinition {
+  supertypes: List<String>
+  attributes: List<String>
+}
+
+/// Version-bound entity reference safe to lower into an authoring contract.
+class EntityReference {
+  release: ReleaseId
+  catalogTypeSystem: String
+  name: String(matches(Regex(#"^Ifc[A-Za-z0-9_]+$"#)))
+  supertypes: List<String>
+  attributes: List<String>
+}
+
+/// One validated positional attribute on an exact version-bound entity.
+class AttributeReference {
+  entity: EntityReference
+  name: String(entity.attributes.contains(this))
+}
+
+/// One explicit property-set template name. Structural catalogs do not claim
+/// full PSD coverage; this preserves the authored reference without inventing
+/// catalog membership.
+class PropertySetReference {
+  release: ReleaseId
+  catalogTypeSystem: String
+  name: String(matches(Regex(#"^Pset_[A-Za-z0-9_]+$"#)))
+}
+
+/// One explicit property-template name. Structural catalogs do not claim full
+/// PSD coverage: this reference preserves what the author supplied and never
+/// pretends that a name was verified against an unavailable template edition.
+class PropertyReference {
+  release: ReleaseId
+  catalogTypeSystem: String
+  container: String(matches(Regex(#"^Pset_[A-Za-z0-9_]+$"#)))
+  name: String(matches(Regex(#"^[A-Za-z][A-Za-z0-9_]*$"#)))
+}

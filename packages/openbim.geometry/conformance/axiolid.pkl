@@ -52,7 +52,7 @@ implementation {
 }
 
 capabilities = new {
-  ["geometry.representation.mesh.triangle"] =
+  ["openbim.geometry:representation.mesh.triangle"] =
     claim(
       "full",
       List("approximate"),
@@ -65,7 +65,7 @@ capabilities = new {
       "crates/axiolid-mesh/src/triangle.rs",
       "TriMesh is a public L1 representation.",
     )
-  ["geometry.representation.mesh.polygon"] =
+  ["openbim.geometry:representation.mesh.polygon"] =
     claim(
       "full",
       List("approximate"),
@@ -78,7 +78,7 @@ capabilities = new {
       "crates/axiolid-mesh/src/polygon.rs",
       "PolygonMesh is a public L1 representation.",
     )
-  ["geometry.representation.curve.analytic"] =
+  ["openbim.geometry:representation.curve.analytic"] =
     claim(
       "full",
       List("analytic"),
@@ -91,7 +91,7 @@ capabilities = new {
       "crates/axiolid-curve",
       "Curve representation and evaluation are a public L1 capability.",
     )
-  ["geometry.representation.surface.analytic"] =
+  ["openbim.geometry:representation.surface.analytic"] =
     claim(
       "full",
       List("analytic"),
@@ -104,7 +104,7 @@ capabilities = new {
       "crates/axiolid-surface",
       "Surface representation and evaluation are a public L1 capability.",
     )
-  ["geometry.representation.nurbs.curve"] =
+  ["openbim.geometry:representation.nurbs.curve"] =
     claim(
       "partial",
       List("analytic"),
@@ -121,7 +121,7 @@ capabilities = new {
       "crates/axiolid-nurbs",
       "The NURBS algorithms explicitly retain bounded/refusal semantics.",
     )
-  ["geometry.representation.nurbs.surface"] =
+  ["openbim.geometry:representation.nurbs.surface"] =
     claim(
       "partial",
       List("analytic"),
@@ -136,7 +136,7 @@ capabilities = new {
       "crates/axiolid-nurbs",
       "The NURBS algorithms explicitly retain bounded/refusal semantics.",
     )
-  ["geometry.representation.brep.topology"] =
+  ["openbim.geometry:representation.brep.topology"] =
     claim(
       "full",
       List("topological"),
@@ -149,7 +149,7 @@ capabilities = new {
       "crates/axiolid-topology",
       "Generic topology retains identity and adjacency independently of a mesh.",
     )
-  ["geometry.representation.brep.exact-result"] =
+  ["openbim.geometry:representation.brep.exact-result"] =
     claim(
       "full",
       List("analytic", "topological"),
@@ -164,7 +164,7 @@ capabilities = new {
       "crates/axiolid-brep",
       "The builder refuses unresolved supports and missing native trim spans.",
     )
-  ["geometry.topology.manifold-validation"] =
+  ["openbim.geometry:topology.manifold-validation"] =
     claim(
       "partial",
       List("topological"),
@@ -179,7 +179,7 @@ capabilities = new {
       "crates/axiolid-topology/src/audit.rs",
       "Structural audit diagnostics are public; geometric validation is deliberately separate.",
     )
-  ["geometry.tessellation.surface"] =
+  ["openbim.geometry:tessellation.surface"] =
     claim(
       "partial",
       List("tolerance-bounded", "approximate"),
@@ -196,7 +196,7 @@ capabilities = new {
       "crates/axiolid-tessellate",
       "Tessellation is an explicit derived output with tolerance and watertight-edge invariants.",
     )
-  ["geometry.boolean.union"] =
+  ["openbim.geometry:boolean.union"] =
     claim(
       "partial",
       List("approximate"),
@@ -209,7 +209,7 @@ capabilities = new {
       "crates/axiolid-boolmesh",
       "Input orientation/manifold checks and result-contract checks guard the mesh backend.",
     )
-  ["geometry.boolean.intersection"] =
+  ["openbim.geometry:boolean.intersection"] =
     claim(
       "partial",
       List("approximate"),
@@ -222,7 +222,7 @@ capabilities = new {
       "crates/axiolid-boolmesh",
       "Input orientation/manifold checks and result-contract checks guard the mesh backend.",
     )
-  ["geometry.boolean.difference"] =
+  ["openbim.geometry:boolean.difference"] =
     claim(
       "partial",
       List("approximate"),
@@ -235,7 +235,7 @@ capabilities = new {
       "crates/axiolid-boolmesh",
       "Input orientation/manifold checks and result-contract checks guard the mesh backend.",
     )
-  ["geometry.clearance.directional"] =
+  ["openbim.geometry:clearance.directional"] =
     claim(
       "partial",
       List("approximate"),
@@ -250,7 +250,7 @@ capabilities = new {
       "crates/axiolid-field/src/clearance.rs",
       "Clearance is reported from explicitly sampled triangle-derived layered fields.",
     )
-  ["geometry.construction.extrusion"] =
+  ["openbim.geometry:construction.extrusion"] =
     claim(
       "partial",
       List("approximate"),
@@ -263,7 +263,7 @@ capabilities = new {
       "crates/axiolid-generate/src/extrude.rs",
       "The current L2 extrusion API returns TriMesh.",
     )
-  ["geometry.construction.revolution"] =
+  ["openbim.geometry:construction.revolution"] =
     claim(
       "partial",
       List("approximate"),
@@ -276,7 +276,7 @@ capabilities = new {
       "crates/axiolid-generate/src/revolve.rs",
       "The current L2 revolution API returns TriMesh.",
     )
-  ["geometry.construction.loft"] =
+  ["openbim.geometry:construction.loft"] =
     claim(
       "partial",
       List("approximate"),
@@ -289,7 +289,7 @@ capabilities = new {
       "crates/axiolid-generate/src/loft.rs",
       "The current L2 loft API returns TriMesh.",
     )
-  ["geometry.construction.sweep"] =
+  ["openbim.geometry:construction.sweep"] =
     claim(
       "partial",
       List("approximate"),
@@ -306,7 +306,7 @@ capabilities = new {
       "crates/axiolid-generate/src/sweep.rs",
       "The current L2 sweep APIs return TriMesh and preserve explicit refusal paths.",
     )
-  ["geometry.repair.diagnosis"] =
+  ["openbim.geometry:repair.diagnosis"] =
     claim(
       "partial",
       List("topological"),
@@ -319,7 +319,7 @@ capabilities = new {
       "crates/axiolid-heal/src/mesh.rs",
       "Mesh diagnosis returns structured defects before any opt-in repair.",
     )
-  ["geometry.repair.explicit"] =
+  ["openbim.geometry:repair.explicit"] =
     claim(
       "partial",
       List("approximate"),

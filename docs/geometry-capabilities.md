@@ -28,7 +28,7 @@ implementation {
 }
 
 capabilities {
-  ["geometry.distance.minimum"] {
+  ["openbim.geometry:distance.minimum"] {
     version = "1"
     level = "full"
     exactness = List("exact-predicates")
@@ -73,7 +73,7 @@ The catalog is separated so incompatible capabilities cannot be collapsed accide
 - `operation`: Boolean, construction, edit, and transform operations;
 - `topology`: adjacency, manifold/geometric validation, tessellation, diagnosis, and explicit repair.
 
-A capability ID is atomic. For example, `geometry.boolean.intersection` does not imply union/difference, and `geometry.intersection.surface-surface` does not imply curve/surface intersection or B-rep imprinting. Scope records whether an operation is 2D/3D, mesh/analytic/NURBS/B-rep, and what it returns.
+A capability ID is atomic. For example, `openbim.geometry:boolean.intersection` does not imply union/difference, and `openbim.geometry:intersection.surface-surface` does not imply curve/surface intersection or B-rep imprinting. Scope records whether an operation is 2D/3D, mesh/analytic/NURBS/B-rep, and what it returns.
 
 ## Requirements and conformance
 

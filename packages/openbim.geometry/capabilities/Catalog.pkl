@@ -8,3 +8,45 @@ import "Topology.pkl" as topology
 
 typealias CapabilityId =
   representation.CapabilityId | query.CapabilityId | operation.CapabilityId | topology.CapabilityId
+
+/// Deterministic enumeration for registries, adapters, and conformance tests.
+allCapabilities: List<CapabilityId> =
+  List(
+    "openbim.geometry:representation.mesh.triangle",
+    "openbim.geometry:representation.mesh.polygon",
+    "openbim.geometry:representation.curve.analytic",
+    "openbim.geometry:representation.surface.analytic",
+    "openbim.geometry:representation.nurbs.curve",
+    "openbim.geometry:representation.nurbs.surface",
+    "openbim.geometry:representation.brep.topology",
+    "openbim.geometry:representation.brep.exact-result",
+    "openbim.geometry:representation.brep.trimmed-analytic",
+    "openbim.geometry:representation.set-theoretic-solid",
+    "openbim.geometry:distance.minimum",
+    "openbim.geometry:distance.signed",
+    "openbim.geometry:clearance.directional",
+    "openbim.geometry:containment.point-in-solid",
+    "openbim.geometry:intersection.curve-curve",
+    "openbim.geometry:intersection.curve-surface",
+    "openbim.geometry:intersection.surface-surface",
+    "openbim.geometry:intersection.section",
+    "openbim.geometry:projection.point-curve",
+    "openbim.geometry:projection.point-surface",
+    "openbim.geometry:boolean.union",
+    "openbim.geometry:boolean.intersection",
+    "openbim.geometry:boolean.difference",
+    "openbim.geometry:boolean.symmetric-difference",
+    "openbim.geometry:construction.extrusion",
+    "openbim.geometry:construction.revolution",
+    "openbim.geometry:construction.sweep",
+    "openbim.geometry:construction.loft",
+    "openbim.geometry:edit.offset",
+    "openbim.geometry:edit.fillet",
+    "openbim.geometry:transform.affine",
+    "openbim.geometry:topology.adjacency",
+    "openbim.geometry:topology.manifold-validation",
+    "openbim.geometry:topology.geometric-validation",
+    "openbim.geometry:tessellation.surface",
+    "openbim.geometry:repair.diagnosis",
+    "openbim.geometry:repair.explicit",
+  )

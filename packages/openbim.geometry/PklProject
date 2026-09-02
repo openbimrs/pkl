@@ -1,3 +1,4 @@
+/// Vendor-neutral geometry capability and requirement contracts for Apple Pkl.
 amends "pkl:Project"
 
 package {
@@ -5,5 +6,27 @@ package {
   baseUri = "package://openbimrs.github.io/pkl/openbim.geometry"
   version = "0.1.0"
   packageZipUrl =
-    "https://github.com/openbimrs/pkl/releases/download/openbim.geometry@0.1.0/openbim.geometry@0.1.0.zip"
+    "https://github.com/openbimrs/pkl/releases/download/openbim.geometry@\(version)/openbim.geometry@\(version).zip"
+  description = "Vendor-neutral geometry capability, requirement, and conformance contracts."
+  authors {
+    "OpenBIM.rs contributors <openbimrs@users.noreply.github.com>"
+  }
+  license = "AGPL-3.0-or-later"
+  issueTracker = "https://github.com/openbimrs/pkl/issues"
+  sourceCode = "https://github.com/openbimrs/pkl/tree/\(name)@\(version)/packages/openbim.geometry"
+  sourceCodeUrlScheme =
+    "https://github.com/openbimrs/pkl/blob/\(name)@\(version)/packages/openbim.geometry%{path}#L%{line}-%{endLine}"
+  apiTests {
+    "tests/geometry.pkl"
+  }
+  exclude {
+    "AGENTS.md"
+    "**/AGENTS.md"
+    "examples/**"
+    "tests/**"
+  }
+}
+
+tests {
+  "tests/geometry.pkl"
 }
