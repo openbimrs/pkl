@@ -1,6 +1,9 @@
-/// Cross-version authoring example using release-bound delta reconstruction.
+/// Cross-version authoring example using release-bound entity and template catalogs.
 module openbim.ifc.examples.basic
 
+import "../TemplateCatalog.pkl" as templates
+import "../templates/Ifc4.pkl" as ifc4Templates
+import "../templates/Ifc4x3.pkl" as ifc4x3Templates
 import "../versions/Ifc2x3.pkl" as ifc2x3
 import "../versions/Ifc4.pkl" as ifc4
 import "../versions/Ifc4x3.pkl" as ifc4x3
@@ -9,13 +12,18 @@ wall2x3 = ifc2x3.entity("IfcWall")
 wall4 = ifc4.entity("IfcWall")
 wall4x3 = ifc4x3.entity("IfcWall")
 
+doorCommon4 = ifc4Templates.propertySet("Pset_DoorCommon")
+handicapAccessible4 = ifc4Templates.property("Pset_DoorCommon", "HandicapAccessible")
+wallBaseQuantities4x3 = ifc4x3Templates.quantitySet("Qto_WallBaseQuantities")
+netVolume4x3 = ifc4x3Templates.quantity("Qto_WallBaseQuantities", "NetVolume")
+doorCommonEvolution = templates.setEvolution("Pset_DoorCommon")
+
 versionBoundary = new {
   ifc4BuildingSupertype = wall4.supertypes.first
   ifc4x3BuiltSupertype = wall4x3.supertypes.first
   ifc4x3ExternalTypeSystem = wall4x3.externalTypeSystem
   directWallAttributes = wall4x3.directAttributes
+  officialIfc4Property = "\(handicapAccessible4.templateSet.name).\(handicapAccessible4.path)"
+  officialIfc4x3Quantity = "\(netVolume4x3.templateSet.name).\(netVolume4x3.path)"
+  doorCommonReleaseOccurrences = doorCommonEvolution.definitions.keys
 }
-
-/// PSD/QTO is intentionally outside this structural package. Consume canonical
-/// typed template exports from the ifc-template-catalog exporter when available.
-templateCatalogExtensionBoundary = "canonical ifc-template-catalog exporter"

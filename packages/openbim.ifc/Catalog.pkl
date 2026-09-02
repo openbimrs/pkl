@@ -19,7 +19,7 @@ ifc2x3Release: ifc.Release = new ifc.Release {
   typeCount = 327
   sourceUri = "https://standards.buildingsmart.org/IFC/RELEASE/IFC2x3/TC1/HTML/"
   externalTypeSystem = "https://standards.buildingsmart.org/IFC/RELEASE/IFC2x3/TC1/HTML/"
-  packageCatalogUri = "package://openbimrs.github.io/pkl/openbim.ifc@0.2.1#/releases/IFC2X3_TC1"
+  packageCatalogUri = "package://openbimrs.github.io/pkl/openbim.ifc@0.3.0#/releases/IFC2X3_TC1"
 }
 
 ifc4Release: ifc.Release = new ifc.Release {
@@ -30,7 +30,7 @@ ifc4Release: ifc.Release = new ifc.Release {
   typeCount = 397
   sourceUri = "https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/"
   externalTypeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4"
-  packageCatalogUri = "package://openbimrs.github.io/pkl/openbim.ifc@0.2.1#/releases/IFC4_ADD2_TC1"
+  packageCatalogUri = "package://openbimrs.github.io/pkl/openbim.ifc@0.3.0#/releases/IFC4_ADD2_TC1"
 }
 
 ifc4x3Release: ifc.Release = new ifc.Release {
@@ -41,7 +41,7 @@ ifc4x3Release: ifc.Release = new ifc.Release {
   typeCount = 436
   sourceUri = "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/"
   externalTypeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
-  packageCatalogUri = "package://openbimrs.github.io/pkl/openbim.ifc@0.2.1#/releases/IFC4X3_ADD2"
+  packageCatalogUri = "package://openbimrs.github.io/pkl/openbim.ifc@0.3.0#/releases/IFC4X3_ADD2"
 }
 
 typealias EntityName = names.EntityName

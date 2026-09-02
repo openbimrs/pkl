@@ -1,59 +1,93 @@
-# IFC structural catalogs
+# IFC release catalogs
 
-`openbim.ifc` is a release-explicit Apple Pkl package for authoring references to IFC schema structure. Version `0.2.1` covers the exact bundled releases used by `openbimrs/ifc`:
+`openbim.ifc@0.3.0` is a release-explicit Apple Pkl package for authoring typed references to IFC entities, official property-set templates (PSD), quantity-set templates (QTO), and their members.
 
-| Entry point | Release | Entities | Defined types |
-|---|---|---:|---:|
-| `versions/Ifc2x3.pkl` | IFC2X3 TC1 | 653 | 327 |
-| `versions/Ifc4.pkl` | IFC4 ADD2 TC1 | 776 | 397 |
-| `versions/Ifc4x3.pkl` | IFC4X3 ADD2 | 876 | 436 |
+## Supported releases
 
-The three entry points are thin views over one delta-compressed catalog:
+| Entry point | Release | Entities | Defined types | PSD sets | QTO sets | Template members |
+|---|---|---:|---:|---:|---:|---:|
+| `versions/Ifc2x3.pkl` | IFC2X3 TC1 | 653 | 327 | 317 | 0 | 1,856 |
+| `versions/Ifc4.pkl` | IFC4 ADD2 TC1 | 776 | 397 | 420 | 93 | 2,807 |
+| `versions/Ifc4x3.pkl` | IFC4X3 ADD2 | 876 | 436 | 502 | 110 | 3,242 |
 
-- one 1,006-name `EntityName` union catches unknown spellings;
-- IFC2X3 stores the baseline direct declarations;
-- IFC4 and IFC4X3 store only additions, removals, and changed direct declarations;
-- ancestry and inherited-first Part 21 attributes are reconstructed for the selected release;
-- `entity` and `entityByName` fail closed when a known name is absent from that release;
-- every result retains its exact release, HTTPS external type-system identity, and separate package transport URI.
+IFC2X3's official snapshot contains no QTO files. The package represents that as an empty quantity catalog instead of backfilling data from a later release.
+
+## Public imports
+
+Use an exact release for normal authoring:
 
 ```pkl
-import "@ifc/versions/Ifc4x3.pkl" as ifc4x3
+import "@ifc/versions/Ifc4.pkl" as ifc4
+import "@ifc/templates/Ifc4.pkl" as ifc4Templates
 
-wall = ifc4x3.entity("IfcWall")
-amendedSupertype = wall.directSupertype
-inheritedSlots = wall.attributes
+wall = ifc4.entity("IfcWall")
+doorCommon = ifc4Templates.propertySet("Pset_DoorCommon")
+handicapAccessible = ifc4Templates.property("Pset_DoorCommon", "HandicapAccessible")
+wallQuantities = ifc4Templates.quantitySet("Qto_WallBaseQuantities")
+netVolume = ifc4Templates.quantity("Qto_WallBaseQuantities", "NetVolume")
 ```
 
-`Catalog.pkl` is a small generated facade over cohesive generated modules in
-`internal/`: names, the IFC2X3 baseline, IFC4 and IFC4X3 deltas, and observed
-transitions. This physical split keeps generated diffs reviewable; it does not
-change the resolver API or duplicate expanded release snapshots. Pkl does not
-enforce module visibility, so `internal/` paths are technically importable but
-carry no compatibility guarantee. Consumers must import `Catalog.pkl` or a
-release module under `versions/`.
+The supported public surfaces are:
 
-`Catalog.pkl` also exposes exact observed additions and removals between the supported snapshots. Those differences are not presented as normative introduction, deprecation, rename, or replacement claims. Such lifecycle claims require separately sourced `LifecycleEvidence` records.
+- `ifc.pkl`: shared typed contracts;
+- `Catalog.pkl`: entity compatibility facade;
+- `TemplateCatalog.pkl`: PSD/QTO catalog and evolution facade;
+- `versions/Ifc2x3.pkl`, `versions/Ifc4.pkl`, and `versions/Ifc4x3.pkl`: unchanged entity-only release views;
+- `templates/Ifc2x3.pkl`, `templates/Ifc4.pkl`, and `templates/Ifc4x3.pkl`: PSD/QTO release views.
 
-## Provenance boundary
+Modules under `internal/` are generated storage and have no compatibility guarantee. The separate `templates/` views are deliberate: importing an existing entity-only `versions/` module does not parse the much larger PSD/QTO catalog.
 
-Direct structural rows are deterministically exported from the bundled `ifc-schema` artifacts in `openbimrs/ifc`; Pkl does not infer declarations from specification prose. Each TSV row contains only an entity name, immediate parent, and directly declared positional slots. The canonical Rust export tests reconstruct every expanded release row exactly.
+Typed helpers accept closed unions of observed set names and member paths. The `*ByName` helpers accept dynamic strings but fail closed when a set is absent from the selected release, the PSD/QTO kind is wrong, or the member does not belong to that set.
 
-The package pins artifact/exporter commits and SHA-256 digests under `packages/openbim.ifc/provenance/`. Frozen TSV evidence is excluded from the package ZIP. `NOTICE` records buildingSMART attribution.
+## Entity evolution
 
-The catalog contains structural facts only. It does not redistribute EXPRESS, XSD, prose, diagrams, or PSD/QTO XML.
+The entity catalog has one 1,006-name union. IFC2X3 stores baseline direct declarations; IFC4 and IFC4X3 store additions, removals, and changed direct declarations. Ancestry and inherited-first Part 21 attributes are reconstructed for the selected release.
 
-## PSD/QTO extension boundary
+Observed additions and removals are snapshot differences, not normative introduction, deprecation, rename, or replacement claims. Those require separately sourced `LifecycleEvidence`.
 
-Version `0.2.1` retains the structural and template boundary introduced in `0.2.0`, which removed the unverified free-form `propertySet` and `property` helpers from `0.1.0`. They made names release-bound but could not prove that a set/member existed in the selected template edition.
+## PSD/QTO evolution
 
-Typed property-set and quantity-set evolution must come from deterministic exports owned by the canonical Rust `ifc-template-catalog`. The typed extension boundary fixes occurrence identity as release-local and requires explicit continuity evidence; shared names or GUIDs are candidates, not proof. Snapshot presence and normative lifecycle evidence remain distinct. Until package-owned runtime references are bundled, downstream consumers must omit IFC template identity claims rather than substitute local strings; MCS must never define its own IFC template schema.
+The template catalog uses the same release-aware shape without conflating equal names with equal identities:
+
+- IFC2X3 stores 317 direct set definitions;
+- IFC4 stores 513 added or changed definitions;
+- IFC4X3 stores 148 added or changed definitions: 109 additions and 39 changed same-name definitions;
+- unchanged semantic definitions inherit from the nearest preceding snapshot;
+- source-file path and SHA-256 provenance remain release-local even when semantics are inherited;
+- each resolved set and member retains the selected IFC release, source GUID when present, owning set, exact member path, template/member kind, value type, and unit type.
+
+`TemplateCatalog.pkl` exposes same-name observations across releases:
+
+```pkl
+import "@ifc/TemplateCatalog.pkl" as templates
+
+riskHistory = templates.setEvolution("Pset_Risk")
+riskTypeHistory = templates.memberEvolution("Pset_Risk", "RiskType")
+```
+
+`Pset_Risk` demonstrates why name equality is insufficient: its source GUID and structure differ between IFC4 ADD2 TC1 and IFC4X3 ADD2. `TemplateSetEvolution.definitions` therefore retains both release-local occurrences and records the observed change. `continuityEvidence` is empty unless an authoritative mapping is explicitly sourced; equal names or GUIDs alone do not populate it.
+
+A member identity is set-scoped. `Pset_DoorCommon.HandicapAccessible` is not collapsed into a global `HandicapAccessible` string that could collide with a member of another set.
+
+## Capability boundary
+
+This is an official **reference catalog**, not a complete PSD/QTO XML object model. It bundles the normalized facts exported by canonical `openbimrs/ifc` tooling: set kind/name/GUID/template type, exact applicability clauses, member path/GUID/kind/value type/unit type, and source-file provenance. Localized descriptions, enumeration payloads, table payloads, and XML round-tripping are not claimed.
+
+That boundary is sufficient for MCS to bind normalized concepts to official IFC set/member identities later without copying an IFC catalog. Detailed value-domain validation should use a future explicitly modeled capability rather than infer semantics absent from this export.
+
+## Provenance
+
+Entity rows come from deterministic `ifc-schema` exports. PSD/QTO rows come from the canonical Rust `ifc-template-catalog` exporter at `openbimrs/ifc` commit `f378f824a3787a11218466a8c63ecd0984d0240b`.
+
+The package pins source commits and SHA-256 digests under `packages/openbim.ifc/provenance/`. Each public `TemplateCatalogRelease` also exposes the immutable exported-TSV `sourceUri`, `sourceSha256`, normalized `sourceDigest`, and `exporterCommit`. Frozen TSV evidence is excluded from the package ZIP. Generation checks reject source drift, unexpected files, symlinks, special files, path escapes, generated-topology drift, and byte differences from deterministic regeneration.
+
+The template inputs contain 3,019 IFC2X3 rows, 3,525 IFC4 rows, and 4,361 IFC4X3 rows. `NOTICE` preserves buildingSMART attribution and CC BY-ND 4.0 terms for the deterministic format-shifted facts.
 
 ## Boundary with MCS and geometry
 
-- IFC owns release identity, structural names, declarations, and eventually typed template catalogs.
+- IFC owns release identity, entity structure, official PSD/QTO references, and source provenance.
 - `openbim.geometry` owns exact atomic geometry capability identifiers.
 - Axioval MCS owns normalized rules, applicability, parameters, and citations.
-- MCS adapters lower package-owned values without copying either specialized catalog.
+- MCS adapters may lower package-owned references but must not copy IFC catalogs or add DIN-specific IFC schema logic.
 
-Package transport URIs identify where Pkl code is fetched. They are never emitted as the normalized external IFC type system.
+Package URIs identify Pkl transport. Resolved references use the edition-specific HTTPS `externalTypeSystem` as semantic IFC identity; package transport URIs are never substituted for it.

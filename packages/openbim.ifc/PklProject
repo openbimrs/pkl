@@ -1,17 +1,18 @@
-/// Delta-compressed, release-explicit IFC structural catalog.
+/// Delta-compressed, release-explicit IFC entity and official PSD/QTO catalogs.
 amends "pkl:Project"
 
 package {
   name = "openbim.ifc"
   baseUri = "package://openbimrs.github.io/pkl/openbim.ifc"
-  version = "0.2.1"
+  version = "0.3.0"
   packageZipUrl =
     "https://github.com/openbimrs/pkl/releases/download/openbim.ifc@\(version)/openbim.ifc@\(version).zip"
-  description = "Delta-compressed Apple Pkl contracts for release-bound IFC structural references."
+  description =
+    "Delta-compressed Apple Pkl contracts for release-bound IFC entities and official PSD/QTO references."
   authors {
     "OpenBIM.rs contributors <openbimrs@users.noreply.github.com>"
   }
-  license = "AGPL-3.0-or-later"
+  license = "AGPL-3.0-or-later AND CC-BY-ND-4.0"
   issueTracker = "https://github.com/openbimrs/pkl/issues"
   sourceCode = "https://github.com/openbimrs/pkl/tree/\(name)@\(version)/packages/openbim.ifc"
   sourceCodeUrlScheme =

@@ -7,6 +7,10 @@ import "pkl:test" as test
 
 import "../Catalog.pkl" as catalog
 import "../ifc.pkl" as ifc
+import "../TemplateCatalog.pkl" as templates
+import "../templates/Ifc2x3.pkl" as ifc2x3Templates
+import "../templates/Ifc4.pkl" as ifc4Templates
+import "../templates/Ifc4x3.pkl" as ifc4x3Templates
 import "../versions/Ifc2x3.pkl" as ifc2x3
 import "../versions/Ifc4.pkl" as ifc4
 import "../versions/Ifc4x3.pkl" as ifc4x3
@@ -48,7 +52,7 @@ facts {
         && reference.externalTypeSystem
           == "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
         && reference.packageCatalogUri.startsWith(
-          "package://openbimrs.github.io/pkl/openbim.ifc@0.2.1#/",
+          "package://openbimrs.github.io/pkl/openbim.ifc@0.3.0#/",
         )
     !ifc4x3.entity("IfcWall").externalTypeSystem.startsWith("package://")
   }
@@ -90,11 +94,108 @@ facts {
     test.catchOrNull(() -> ifc4x3.entityByName("IfcBuildingElement")) != null
   }
 
-  ["template extension stays release-local and evidence-gated"] {
-    ifc.templateCatalogExtension.status == "not-bundled"
+  ["template catalogs expose exact official release inventories"] {
+    ifc.templateCatalogExtension.status == "bundled"
     ifc.templateCatalogExtension.occurrenceIdentity == "release-local"
     ifc.templateCatalogExtension.continuityPolicy == "explicit-evidence-required"
     ifc.templateCatalogExtension.sourceContract == "version-explicit-guid-bearing-tsv"
+    ifc2x3Templates.templateCatalog.release.id == "IFC2X3_TC1"
+    ifc2x3Templates.templateCatalog.propertySetCount == 317
+    ifc2x3Templates.templateCatalog.quantitySetCount == 0
+    ifc2x3Templates.templateCatalog.memberCount == 1856
+    ifc2x3Templates.templateSetNames.length == 317
+    ifc2x3Templates.propertySetNames.length == 317
+    ifc2x3Templates.quantitySetNames.isEmpty
+    ifc4Templates.templateCatalog.propertySetCount == 420
+    ifc4Templates.templateCatalog.quantitySetCount == 93
+    ifc4Templates.templateCatalog.memberCount == 2807
+    ifc4Templates.templateCatalog.sourceSha256
+      == "15dca1204b3f7533b2ee85fe353ad1d9b23fdf318fcb46100bef45dd5c2eb42c"
+    ifc4Templates.templateCatalog.exporterCommit == "f378f824a3787a11218466a8c63ecd0984d0240b"
+    ifc4Templates.templateCatalog.sourceUri
+      == "https://github.com/openbimrs/ifc/blob/f378f824a3787a11218466a8c63ecd0984d0240b/ifc-template-catalog/data/ifc4-add2-tc1.tsv"
+    ifc4Templates.templateSetNames.length == 513
+    ifc4Templates.propertySetNames.length == 420
+    ifc4Templates.quantitySetNames.length == 93
+    ifc4x3Templates.templateCatalog.propertySetCount == 502
+    ifc4x3Templates.templateCatalog.quantitySetCount == 110
+    ifc4x3Templates.templateCatalog.memberCount == 3242
+    ifc4x3Templates.templateSetNames.length == 612
+    ifc4x3Templates.propertySetNames.length == 502
+    ifc4x3Templates.quantitySetNames.length == 110
+    templates.templateSetNames.length == 700
+  }
+
+  ["official IFC4 property references are set-scoped and typed"] {
+    let (set = ifc4Templates.propertySet("Pset_DoorCommon"))
+    let (memberReference = ifc4Templates.property("Pset_DoorCommon", "HandicapAccessible"))
+      set.release == "IFC4_ADD2_TC1"
+        && set.kind == "psd"
+        && set.sourceGuid == "0e8d2680d1db11e1800000215ad4efdf"
+        && set.members.length == 19
+        && memberReference.templateSet == set
+        && memberReference.path == "HandicapAccessible"
+        && memberReference.sourceGuid == "76903c80d1dc11e1800000215ad4efdf"
+        && memberReference.kind == "single"
+        && memberReference.valueType == "IfcBoolean"
+        && memberReference.externalTypeSystem == ifc4.release.externalTypeSystem
+        && memberReference.packageCatalogUri.startsWith(
+          "package://openbimrs.github.io/pkl/openbim.ifc@0.3.0#/",
+        )
+  }
+
+  ["quantity catalogs are release-explicit and IFC2X3 is honestly empty"] {
+    test.catchOrNull(() -> ifc2x3Templates.quantitySetByName("Qto_WallBaseQuantities")) != null
+    let (set = ifc4Templates.quantitySet("Qto_WallBaseQuantities"))
+    let (quantityReference = ifc4Templates.quantity("Qto_WallBaseQuantities", "NetVolume"))
+      set.kind == "qto"
+        && quantityReference.kind == "volume"
+        && quantityReference.valueType == "Q_VOLUME"
+        && quantityReference.templateSet.name == "Qto_WallBaseQuantities"
+  }
+
+  ["same-name set evolution preserves changed release-local occurrences"] {
+    let (history = templates.setEvolution("Pset_Risk"))
+      history.definitions.length == 3
+        && history.definitions["IFC4_ADD2_TC1"].sourceGuid
+          == "ff20d400d20011e1800000215ad4efdf"
+        && history.definitions["IFC4X3_ADD2"].sourceGuid
+          == "91e0ddf4d6ba45e3b689a10510bef4bc"
+        && history.observedChangedIn.contains("IFC4X3_ADD2")
+        && history.continuityEvidence.isEmpty
+  }
+
+  ["member evolution preserves changed release-local property occurrences"] {
+    let (history = templates.memberEvolution("Pset_Risk", "RiskType"))
+      history.setName == "Pset_Risk"
+        && history.path == "RiskType"
+        && history.definitions["IFC4_ADD2_TC1"].sourceGuid
+          == "0516b500d20111e1800000215ad4efdf"
+        && history.definitions["IFC4X3_ADD2"].sourceGuid
+          == "53651ee9f81d4642abbd27656122671a"
+        && history.observedChangedIn.contains("IFC4X3_ADD2")
+        && history.continuityEvidence.isEmpty
+  }
+
+  ["unchanged structures are inherited while provenance remains release-local"] {
+    let (history = templates.setEvolution("Pset_DoorCommon"))
+    let (ifc4Set = ifc4Templates.propertySet("Pset_DoorCommon"))
+    let (ifc4x3Set = ifc4x3Templates.propertySet("Pset_DoorCommon"))
+      !history.observedChangedIn.contains("IFC4X3_ADD2")
+        && ifc4Set.sourceGuid == ifc4x3Set.sourceGuid
+        && ifc4x3Set.source.sha256
+          == "704a4f7d52b06b1421b75f4f4cdb79603d4b05a5663f6315faf804e6b6c63e56"
+        && ifc4Set.source.sha256 != ifc4x3Set.source.sha256
+        && ifc4Set.release != ifc4x3Set.release
+  }
+
+  ["template resolution fails closed for absent sets and member pairs"] {
+    test.catchOrNull(() -> ifc4Templates.propertySetByName("Pset_DefinitelyMissing")) != null
+    test.catchOrNull(() -> ifc4Templates.propertyByName("Pset_DoorCommon", "DefinitelyMissing"))
+      != null
+    test.catchOrNull(() -> ifc4Templates.quantitySetByName("Pset_DoorCommon")) != null
+    test.catchOrNull(() -> ifc4Templates.propertyByName("Qto_WallBaseQuantities", "NetVolume"))
+      != null
   }
 
   ["attribute references validate membership"] {

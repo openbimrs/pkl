@@ -1,26 +1,45 @@
-openbim.ifc 0.2.1 includes generated structural catalogs for IFC2x3 TC1,
-IFC4 ADD2 TC1, and IFC4X3 ADD2.
+openbim.ifc 0.3.0 includes generated entity and official PSD/QTO reference
+catalogs for IFC2x3 TC1, IFC4 ADD2 TC1, and IFC4X3 ADD2.
 
 Repository-authored Pkl contracts and tooling are licensed under
-AGPL-3.0-or-later. The generated catalog rows are deterministic format shifts
-of structural schema facts (entity names, immediate parents, and directly
-declared attribute names) from the compiled `ifc-schema` artifacts at
-openbimrs/ifc
-commit a7c4949bb941504ce874bdec13bd81d33491b5cb. Catalogs were exported
-with `ifc-schema` commit a97e8f7e646407d6a4263a664631a1877dfa2986. No EXPRESS source or
-specification prose is included.
+AGPL-3.0-or-later. Upstream IFC catalog facts are distributed under
+CC BY-ND 4.0; the package therefore declares the aggregate expression
+`AGPL-3.0-or-later AND CC-BY-ND-4.0`.
+
+Entity rows are deterministic format shifts of structural schema facts (entity
+names, immediate parents, and directly declared attribute names) from compiled
+`ifc-schema` artifacts at openbimrs/ifc commit
+a7c4949bb941504ce874bdec13bd81d33491b5cb. They were exported with
+`ifc-schema` commit a97e8f7e646407d6a4263a664631a1877dfa2986. No EXPRESS
+source or specification prose is included.
+
+PSD/QTO rows are deterministic format shifts produced by the canonical Rust
+`ifc-template-catalog` exporter at openbimrs/ifc commit
+f378f824a3787a11218466a8c63ecd0984d0240b. Bundled Pkl facts preserve set
+kind/name/GUID/template type, applicability, member path/GUID/kind/value type,
+unit type, and source-file path/SHA-256. The source XML, descriptions, and
+specification prose are not included.
 
 Sources:
 - IFC2x3 TC1: https://standards.buildingsmart.org/IFC/RELEASE/IFC2x3/TC1/HTML/
 - IFC4 ADD2 TC1: https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/
 - IFC4X3 ADD2: https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/
+- PSD/QTO licensing/source index: https://technical.buildingsmart.org/standards/ifc/ifc-schema-specifications/
+- IFC4X3 PSD/QTO snapshot: buildingSMART `IFC4.x-development` commit
+  `524daac53ca682e0649d240ace87f4cd7baff6e7`, tree
+  `5ac02c6686df303a49e9bf5c05c75a0c91240aa7`
 
-Structural TSV digests:
+Structural TSV SHA-256 digests:
 - IFC2x3 TC1: 8c89a84de9c603e9dfe713aa3f89f86347972cdaaefbf0a723137ef1c280d746
 - IFC4 ADD2 TC1: 51109c3295ecb17a38f8efdeca66bbd79d9d961719b20ba99888888b179ce5f6
 - IFC4X3 ADD2: b00744442087c969f321550b3dcea7e49e0834ca001a4700ea5459e36eb56f12
 
-Upstream IFC names and schema structure are copyright buildingSMART
-International Limited and distributed under CC BY-ND 4.0. The format shift does
-not modify those structural facts. Preserve this notice and
+PSD/QTO TSV SHA-256 digests:
+- IFC2x3 TC1: 6950f7686b67b68d456e2dde0be9fcae83cbc7849171a1d2c9bf95d4b0718586
+- IFC4 ADD2 TC1: 15dca1204b3f7533b2ee85fe353ad1d9b23fdf318fcb46100bef45dd5c2eb42c
+- IFC4X3 ADD2: 11fb5c50dd87b78ccc3f5c09470942cc5d454760d07054d9b879fafe26a737c1
+
+Upstream IFC names, schema structure, property-set definitions, and quantity-set
+definitions are copyright buildingSMART International Limited. The deterministic
+format shift does not modify those facts. Preserve this notice and
 LICENSES/CC-BY-ND-4.0.txt when redistributing the package.

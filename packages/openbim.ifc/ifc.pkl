@@ -15,7 +15,7 @@ class Release {
   /// Release-bound IFC identifier. This is domain identity, never package transport.
   externalTypeSystem: String(startsWith("https://"))
   /// Package transport identity for this generated catalog release.
-  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.2.1#/"))
+  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.3.0#/"))
 }
 
 /// Physical storage fact: immediate parent and directly declared positional slots only.
@@ -28,7 +28,7 @@ class DirectEntityDefinition {
 class EntityReference {
   release: ReleaseId
   externalTypeSystem: String(startsWith("https://"))
-  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.2.1#/"))
+  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.3.0#/"))
   name: String(matches(Regex(#"^Ifc[A-Za-z0-9_]+$"#)))
   directSupertype: String?
   directAttributes: List<String>
@@ -62,11 +62,131 @@ class LifecycleEvidence {
   target: String?
 }
 
-/// Typed extension boundary only. PSD/QTO occurrences must come from canonical
-/// ifc-template-catalog exports and continuity always requires explicit evidence.
+typealias TemplateSetKind = "psd" | "qto"
+typealias TemplateMemberKind =
+  "single"
+    | "bounded"
+    | "enumerated"
+    | "list"
+    | "reference"
+    | "table"
+    | "complex"
+    | "length"
+    | "area"
+    | "volume"
+    | "count"
+    | "weight"
+    | "time"
+
+/// One exact release applicability clause. Entity and predefined type remain paired.
+class TemplateApplicability {
+  entity: String(matches(Regex(#"^Ifc[A-Za-z0-9_]+$"#)))
+  predefinedType: String?
+  includesSubtypes: Boolean
+}
+
+/// One member as published for one release-local set occurrence.
+class DirectTemplateMemberDefinition {
+  sourceGuid: String?
+  kind: TemplateMemberKind
+  valueType: String
+  unitType: String?
+}
+
+/// Set semantics as published for one exact release. Source-file provenance is
+/// stored independently so unchanged semantics can be shared across snapshots.
+class DirectTemplateSetDefinition {
+  kind: TemplateSetKind
+  sourceGuid: String?
+  templateType: String
+  applicability: List<TemplateApplicability>
+  members: Mapping<String, DirectTemplateMemberDefinition>(isNotEmpty)
+}
+
+class TemplateSourceProvenance {
+  path: String(isNotEmpty)
+  sha256: String(matches(Regex(#"^[0-9a-f]{64}$"#)))
+}
+
+/// Exact inventory and aggregate provenance for one official catalog snapshot.
+class TemplateCatalogRelease {
+  release: Release
+  sourceUri: String(startsWith("https://github.com/openbimrs/ifc/blob/"))
+  sourceSha256: String(matches(Regex(#"^[0-9a-f]{64}$"#)))
+  sourceDigest: String(matches(Regex(#"^[0-9a-f]{64}$"#)))
+  exporterCommit: String(matches(Regex(#"^[0-9a-f]{40}$"#)))
+  setCount: UInt
+  propertySetCount: UInt
+  quantitySetCount: UInt
+  memberCount: UInt
+  rowCount: UInt
+}
+
+/// Release-local official PSD/QTO set reference.
+class TemplateSetReference {
+  release: ReleaseId
+  externalTypeSystem: String(startsWith("https://"))
+  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.3.0#/"))
+  kind: TemplateSetKind
+  name: String(matches(Regex(#"^(Pset|Qto)_[A-Za-z0-9_]+$"#)))
+  sourceGuid: String?
+  templateType: String
+  applicability: List<TemplateApplicability>
+  members: Mapping<String, DirectTemplateMemberDefinition>(isNotEmpty)
+  source: TemplateSourceProvenance
+}
+
+/// Release-local member reference. `path` remains scoped by its owning set.
+class TemplateMemberReference {
+  templateSet: TemplateSetReference
+  release: ReleaseId
+  externalTypeSystem: String(startsWith("https://"))
+  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.3.0#/"))
+  path: String(templateSet.members.containsKey(this))
+  sourceGuid: String?
+  kind: TemplateMemberKind
+  valueType: String
+  unitType: String?
+}
+
+/// Explicit continuity evidence. This list stays empty until a sourced mapping
+/// says two release-local occurrences are the same domain identity.
+class TemplateContinuityEvidence {
+  kind: "authoritative-mapping"
+  setName: String(matches(Regex(#"^(Pset|Qto)_[A-Za-z0-9_]+$"#)))
+  memberPath: String?
+  fromRelease: ReleaseId
+  toRelease: ReleaseId
+  sourceUri: String(startsWith("https://"))
+  sourceGuid: String?
+}
+
+/// Same-name observations across pinned snapshots, not an inferred continuity claim.
+class TemplateSetEvolution {
+  name: String(matches(Regex(#"^(Pset|Qto)_[A-Za-z0-9_]+$"#)))
+  definitions: Mapping<ReleaseId, DirectTemplateSetDefinition>(isNotEmpty)
+  observedAddedIn: List<ReleaseId>
+  observedRemovedIn: List<ReleaseId>
+  observedChangedIn: List<ReleaseId>
+  continuityEvidence: List<TemplateContinuityEvidence>
+}
+
+/// Same set-scoped member-path observations across pinned snapshots.
+class TemplateMemberEvolution {
+  setName: String(matches(Regex(#"^(Pset|Qto)_[A-Za-z0-9_]+$"#)))
+  path: String(isNotEmpty)
+  definitions: Mapping<ReleaseId, DirectTemplateMemberDefinition>(isNotEmpty)
+  observedAddedIn: List<ReleaseId>
+  observedRemovedIn: List<ReleaseId>
+  observedChangedIn: List<ReleaseId>
+  continuityEvidence: List<TemplateContinuityEvidence>
+}
+
+/// Bundled catalog boundary. Occurrences remain release-local and continuity
+/// still requires evidence even when source GUIDs happen to match.
 class TemplateCatalogExtensionBoundary {
   exporter: "ifc-template-catalog"
-  status: "not-bundled"
+  status: "bundled"
   occurrenceIdentity: "release-local"
   continuityPolicy: "explicit-evidence-required"
   sourceContract: "version-explicit-guid-bearing-tsv"
@@ -74,7 +194,7 @@ class TemplateCatalogExtensionBoundary {
 
 const templateCatalogExtension = new TemplateCatalogExtensionBoundary {
   exporter = "ifc-template-catalog"
-  status = "not-bundled"
+  status = "bundled"
   occurrenceIdentity = "release-local"
   continuityPolicy = "explicit-evidence-required"
   sourceContract = "version-explicit-guid-bearing-tsv"

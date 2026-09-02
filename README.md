@@ -87,26 +87,30 @@ pkl project package --output-path build packages/openbim.loin
 
 ## `openbim.ifc`
 
-`openbim.ifc` provides one delta-compressed, release-explicit structural catalog
-for IFC2X3 TC1, IFC4 ADD2 TC1, and IFC4X3 ADD2. Its stable `Catalog.pkl` facade
-composes cohesive generated storage modules; thin version entry points
-reconstruct ancestry and inherited positional slots from direct declarations;
-unknown or release-absent entities fail closed. Canonical rows come from exact
-`openbimrs/ifc` `ifc-schema` exports rather than MCS-authored strings.
+`openbim.ifc` provides delta-compressed, release-explicit entity and official
+PSD/QTO reference catalogs for IFC2X3 TC1, IFC4 ADD2 TC1, and IFC4X3 ADD2.
+Stable entity and template facades compose generated baseline, delta, provenance,
+and transition modules; thin version entry points reject names and set/member pairs
+that are absent from the selected release. Canonical rows come from exact
+`openbimrs/ifc` `ifc-schema` and `ifc-template-catalog` exports rather than
+MCS-authored strings.
 
 ```pkl
-import "@ifc/versions/Ifc4x3.pkl" as ifc4x3
+import "@ifc/versions/Ifc4.pkl" as ifc4
+import "@ifc/templates/Ifc4.pkl" as ifc4Templates
 
-wall = ifc4x3.entity("IfcWall")
-inheritedSlots = wall.attributes
+wall = ifc4.entity("IfcWall")
+doorCommon = ifc4Templates.propertySet("Pset_DoorCommon")
+handicapAccessible = ifc4Templates.property("Pset_DoorCommon", "HandicapAccessible")
+netVolume = ifc4Templates.quantity("Qto_WallBaseQuantities", "NetVolume")
 ```
 
-The package deliberately does not bundle PSD/QTO runtime data in the `0.2.x` line.
-The canonical `ifc-template-catalog` now supplies version-explicit, GUID-bearing
-exports; this package fixes their release-local occurrence and evidence-required
-continuity boundary for later measured ingestion. See
-[`docs/ifc-catalogs.md`](docs/ifc-catalogs.md) for provenance and the boundary
-with `openbim.geometry` and Axioval MCS.
+Template occurrences remain release-local. Same names and source GUIDs are
+observations, not cross-release continuity claims; changed definitions receive
+release-local revisions while unchanged semantics inherit from the nearest
+snapshot. See [`docs/ifc-catalogs.md`](docs/ifc-catalogs.md) for counts,
+provenance, capability limits, and the boundary with `openbim.geometry` and
+Axioval MCS.
 
 ## `openbim.geometry`
 
@@ -141,7 +145,7 @@ and the [analytic B-rep requirement example](packages/openbim.geometry/examples/
 | Package | Version | Semantic model | XML codec |
 |---|---:|---|---|
 | `openbim.loin` | 0.1.0 | Implemented and tested | Not implemented |
-| `openbim.ifc` | 0.2.1 | Delta-compressed IFC2X3, IFC4, and IFC4X3 structural catalog | Not applicable: schema-as-data |
+| `openbim.ifc` | 0.3.0 | Delta-compressed entities plus official release-bound PSD/QTO references | Not applicable: schema-as-data |
 | `openbim.geometry` | 0.1.0 | Implemented and tested | Not applicable: capability vocabulary |
 
 See [`docs/loin-port.md`](docs/loin-port.md) for the audited port map and
@@ -150,5 +154,6 @@ capability boundary.
 ## License
 
 Repository-authored work is `AGPL-3.0-or-later`. Historical MIT attribution
-from the semantic source is preserved; see [LICENSING.md](LICENSING.md),
-[NOTICE](NOTICE), and [LICENSES/MIT.txt](LICENSES/MIT.txt).
+from the semantic source and buildingSMART CC BY-ND 4.0 attribution for
+format-shifted IFC catalog facts are preserved; see [LICENSING.md](LICENSING.md),
+package notices, and `LICENSES/`.
