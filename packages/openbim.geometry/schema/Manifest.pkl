@@ -1,0 +1,22 @@
+/// Root module for one geometry-kernel implementation manifest.
+///
+/// A consumer normally aliases this package as `geometry` and writes:
+/// `amends "@geometry/schema/Manifest.pkl"`.
+open module openbim.geometry.schema.manifest
+
+import "../capabilities/Catalog.pkl" as catalog
+import "Capability.pkl" as capability
+
+/// Stable identity of the implementation making the claims.
+class Implementation {
+  id: String(matches(Regex(#"^[a-z0-9]+([.-][a-z0-9]+)+$"#)))
+  name: String
+  version: String(matches(Regex(#"^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$"#)))
+  homepage: String? = null
+}
+
+/// Implementation identity is required so claims cannot be detached from a provider.
+implementation: Implementation
+
+/// Claims keyed by an atomic standardized capability ID.
+capabilities: Mapping<catalog.CapabilityId, capability.CapabilityClaim> = new {}

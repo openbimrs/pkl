@@ -1,0 +1,14 @@
+/// Query and classification capability identifiers.
+module openbim.geometry.capabilities.query
+
+typealias CapabilityId =
+  "geometry.distance.minimum"
+    | "geometry.distance.signed"
+    | "geometry.clearance.directional"
+    | "geometry.containment.point-in-solid"
+    | "geometry.intersection.curve-curve"
+    | "geometry.intersection.curve-surface"
+    | "geometry.intersection.surface-surface"
+    | "geometry.intersection.section"
+    | "geometry.projection.point-curve"
+    | "geometry.projection.point-surface"

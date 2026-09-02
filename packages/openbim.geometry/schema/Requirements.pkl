@@ -1,0 +1,25 @@
+/// Declarative requirements that a downstream checker may match against manifests.
+module openbim.geometry.schema.requirements
+
+import "../capabilities/Catalog.pkl" as catalog
+import "Capability.pkl" as capability
+import "Exactness.pkl" as exactness
+
+/// Minimum acceptable claim for one atomic geometry capability.
+class CapabilityRequirement {
+  capability: catalog.CapabilityId
+  minimumLevel: exactness.CapabilityLevel = "full"
+  acceptedExactness: List<exactness.Exactness>(isNotEmpty)
+  dimensions: List<exactness.Dimension>(isNotEmpty)
+  inputRepresentations: List<exactness.Representation>(isNotEmpty)
+  outputRepresentations: List<exactness.Representation>(isNotEmpty)
+}
+
+/// A named, declarative capability profile.
+/// Every `allOf` requirement must match. Each list in `anyOf` is an alternative
+/// complete profile; an empty `anyOf` means no alternatives are needed.
+class GeometryRequirements {
+  id: String
+  allOf: List<CapabilityRequirement> = List()
+  anyOf: List<List<CapabilityRequirement>> = List()
+}

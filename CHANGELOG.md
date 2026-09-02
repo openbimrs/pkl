@@ -10,6 +10,9 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
   the repository gate.
 - Create the Pkl installation directory on fresh CI runners.
 
+### Added
+- Added `openbim.geometry` 0.1.0: a vendor- and application-neutral geometry capability catalog, scoped implementation manifests, downstream requirements, and declarative conformance reports. The initial Axiolid manifest is source-evidenced and deliberately leaves unsupported exact construction, general intersections, minimum distance, and containment absent.
+
 ## [0.1.0] - 2026-09-01
 
 ### Added

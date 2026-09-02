@@ -1,0 +1,36 @@
+/// Quality and scope qualifiers shared by implementation claims and requirements.
+module openbim.geometry.schema.exactness
+
+/// Numeric or semantic guarantee for a capability in its declared scope.
+/// `exact` is exact construction; `exact-predicates` guarantees decisions only.
+typealias Exactness =
+  "exact"
+    | "exact-predicates"
+    | "analytic"
+    | "topological"
+    | "tolerance-bounded"
+    | "conservative"
+    | "approximate"
+
+/// Geometric dimensions covered by a claim. A claim must state its dimensions.
+typealias Dimension = "0D" | "1D" | "2D" | "3D"
+
+/// Input or output representation named by a capability scope.
+typealias Representation =
+  "point"
+    | "curve"
+    | "profile"
+    | "surface"
+    | "triangle-mesh"
+    | "polygon-mesh"
+    | "analytic-curve"
+    | "analytic-surface"
+    | "nurbs-curve"
+    | "nurbs-surface"
+    | "brep"
+    | "solid"
+    | "set-theoretic-solid"
+    | "layered-field"
+
+/// An implementation may fully or partially implement one atomic capability.
+typealias CapabilityLevel = "partial" | "full"

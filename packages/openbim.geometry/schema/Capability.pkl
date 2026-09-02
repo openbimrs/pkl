@@ -1,0 +1,33 @@
+/// Reusable data types for one implementation capability claim.
+module openbim.geometry.schema.capability
+
+import "Exactness.pkl" as exactness
+
+/// One explicit representation and case boundary for a claim.
+class SupportScope {
+  dimensions: List<exactness.Dimension>(isNotEmpty)
+  inputRepresentations: List<exactness.Representation>(isNotEmpty)
+  outputRepresentations: List<exactness.Representation>(isNotEmpty)
+  supportedCases: List<String>(isNotEmpty)
+}
+
+/// Verifiable evidence for a claim. `uri` should be a stable source, test, or API location.
+class Evidence {
+  kind: "source" | "test" | "documentation" | "benchmark"
+  uri: String
+  locator: String? = null
+  note: String? = null
+}
+
+/// A versioned claim about one catalog capability.
+///
+/// `full` means complete only for the declared `scope`; `partial` means the
+/// scope is intentionally narrower than the capability's normative contract.
+class CapabilityClaim {
+  version: String(matches(Regex(#"^[1-9][0-9]*$"#)))
+  level: exactness.CapabilityLevel
+  exactness: List<exactness.Exactness>(isNotEmpty)
+  scope: SupportScope
+  limitations: List<String> = List()
+  evidence: List<Evidence>(isNotEmpty)
+}

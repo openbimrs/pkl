@@ -1,0 +1,68 @@
+/// Exercises catalog typing, schema constraints, and the Axiolid conformance fixture.
+module openbim.geometry.tests
+
+amends "pkl:test"
+
+import "pkl:test" as test
+
+import "../capabilities/Catalog.pkl" as catalog
+import "../conformance/axiolid.pkl" as axiolid
+import "../examples/requirements/analytic-brep.pkl" as analyticBrep
+import "../schema/Capability.pkl" as capability
+
+facts {
+  ["implementation identity"] {
+    axiolid.implementation.id == "org.axiolid.kernel"
+  }
+
+  ["complete triangle mesh claim"] {
+    axiolid.capabilities["geometry.representation.mesh.triangle"].level == "full"
+  }
+
+  ["mesh Boolean remains partial"] {
+    axiolid.capabilities["geometry.boolean.intersection"].level == "partial"
+  }
+
+  ["clearance remains sampled"] {
+    axiolid.capabilities["geometry.clearance.directional"].exactness.contains("approximate")
+  }
+
+  ["unimplemented minimum distance is absent"] {
+    !axiolid.capabilities.containsKey("geometry.distance.minimum")
+  }
+  ["unknown capability IDs are rejected"] {
+    test.catchOrNull(() ->
+      (new CatalogProbe { claims { ["geometry.unknown"] = "not a capability" } }).claims
+    ) != null
+  }
+
+  ["analytic B-rep requirements stay representation-specific"] {
+    analyticBrep.requirements.allOf.length == 2
+    analyticBrep.requirements.allOf.first.capability
+      == "geometry.representation.brep.trimmed-analytic"
+    analyticBrep.requirements.allOf.last.capability == "geometry.topology.geometric-validation"
+  }
+
+  ["unsupported precision is rejected"] {
+    test.catchOrNull(() ->
+      (
+        new capability.CapabilityClaim {
+          version = "1"
+          level = "full"
+          exactness = List("not-a-guarantee")
+          scope = new capability.SupportScope {
+            dimensions = List("3D")
+            inputRepresentations = List("triangle-mesh")
+            outputRepresentations = List("triangle-mesh")
+            supportedCases = List("test")
+          }
+          evidence =
+            List(new capability.Evidence {
+              kind = "source"
+              uri = "https://example.invalid"
+            })
+        }
+      ).exactness
+    ) != null
+  }
+}

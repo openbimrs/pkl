@@ -1,0 +1,2 @@
+/// Evaluate the evidence-backed Axiolid capability declaration as JSON or PCF.
+amends "../conformance/axiolid.pkl"

@@ -1,0 +1,10 @@
+/// Topology, validation, conversion, and repair capability identifiers.
+module openbim.geometry.capabilities.topology
+
+typealias CapabilityId =
+  "geometry.topology.adjacency"
+    | "geometry.topology.manifold-validation"
+    | "geometry.topology.geometric-validation"
+    | "geometry.tessellation.surface"
+    | "geometry.repair.diagnosis"
+    | "geometry.repair.explicit"

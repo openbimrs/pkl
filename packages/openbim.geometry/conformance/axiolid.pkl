@@ -1,0 +1,335 @@
+/// Evidence-backed capability declaration for Axiolid Kernel 0.1.0.
+///
+/// This is a versioned conformance fixture, not a promise about future releases.
+/// It deliberately omits general minimum distance, point containment, analytic
+/// intersections, and exact B-rep construction because those capabilities are
+/// not presently implemented.
+amends "../schema/Manifest.pkl"
+
+import "../schema/Capability.pkl" as capability
+import "../schema/Exactness.pkl" as exactness
+
+local function scope(
+  inputs: List<exactness.Representation>,
+  outputs: List<exactness.Representation>,
+  cases: List<String>,
+): capability.SupportScope = new capability.SupportScope {
+  dimensions = List("3D")
+  inputRepresentations = inputs
+  outputRepresentations = outputs
+  supportedCases = cases
+}
+
+local function sourceEvidence(locator_: String, note_: String): capability.Evidence = new capability
+  .Evidence {
+  kind = "source"
+  uri = "https://github.com/axiolid/kernel/tree/ed07679ee698d960380ec4913f62ffd8c7a653a5"
+  locator = locator_
+  note = note_
+}
+
+local function claim(
+  level_: exactness.CapabilityLevel,
+  exactness_: List<exactness.Exactness>,
+  scope_: capability.SupportScope,
+  limitations_: List<String>,
+  locator: String,
+  note: String,
+): capability.CapabilityClaim = new capability.CapabilityClaim {
+  version = "1"
+  level = level_
+  exactness = exactness_
+  scope = scope_
+  limitations = limitations_
+  evidence = List(sourceEvidence(locator, note))
+}
+
+implementation {
+  id = "org.axiolid.kernel"
+  name = "Axiolid Kernel"
+  version = "0.1.0"
+  homepage = "https://github.com/axiolid/kernel"
+}
+
+capabilities = new {
+  ["geometry.representation.mesh.triangle"] =
+    claim(
+      "full",
+      List("approximate"),
+      scope(
+        List("triangle-mesh"),
+        List("triangle-mesh"),
+        List("Indexed triangle meshes with explicit validation."),
+      ),
+      List(),
+      "crates/axiolid-mesh/src/triangle.rs",
+      "TriMesh is a public L1 representation.",
+    )
+  ["geometry.representation.mesh.polygon"] =
+    claim(
+      "full",
+      List("approximate"),
+      scope(
+        List("polygon-mesh"),
+        List("polygon-mesh"),
+        List("Indexed polygon meshes with explicit validation."),
+      ),
+      List(),
+      "crates/axiolid-mesh/src/polygon.rs",
+      "PolygonMesh is a public L1 representation.",
+    )
+  ["geometry.representation.curve.analytic"] =
+    claim(
+      "full",
+      List("analytic"),
+      scope(
+        List("analytic-curve"),
+        List("analytic-curve"),
+        List("Supported elementary 2D and 3D curves retain analytic parameters."),
+      ),
+      List("This declaration does not claim every analytic curve family."),
+      "crates/axiolid-curve",
+      "Curve representation and evaluation are a public L1 capability.",
+    )
+  ["geometry.representation.surface.analytic"] =
+    claim(
+      "full",
+      List("analytic"),
+      scope(
+        List("analytic-surface"),
+        List("analytic-surface"),
+        List("Supported elementary surfaces retain analytic parameters."),
+      ),
+      List("This declaration does not claim every analytic surface family."),
+      "crates/axiolid-surface",
+      "Surface representation and evaluation are a public L1 capability.",
+    )
+  ["geometry.representation.nurbs.curve"] =
+    claim(
+      "partial",
+      List("analytic"),
+      scope(
+        List("nurbs-curve"),
+        List("nurbs-curve"),
+        List(
+          "Rational polynomial B-spline evaluation, derivatives, knot operations, and bounded projection.",
+        ),
+      ),
+      List(
+        "Projection is bounded best-candidate capability, not globally certified closest-point inversion.",
+      ),
+      "crates/axiolid-nurbs",
+      "The NURBS algorithms explicitly retain bounded/refusal semantics.",
+    )
+  ["geometry.representation.nurbs.surface"] =
+    claim(
+      "partial",
+      List("analytic"),
+      scope(
+        List("nurbs-surface"),
+        List("nurbs-surface"),
+        List(
+          "Rational polynomial B-spline surface evaluation, partials, normals, knot operations, and bounded projection.",
+        ),
+      ),
+      List("General certified point-to-UV inversion is unavailable."),
+      "crates/axiolid-nurbs",
+      "The NURBS algorithms explicitly retain bounded/refusal semantics.",
+    )
+  ["geometry.representation.brep.topology"] =
+    claim(
+      "full",
+      List("topological"),
+      scope(
+        List("brep"),
+        List("brep"),
+        List("Arena-backed vertices, edges, edge uses, loops, faces, shells, and solids."),
+      ),
+      List(),
+      "crates/axiolid-topology",
+      "Generic topology retains identity and adjacency independently of a mesh.",
+    )
+  ["geometry.representation.brep.exact-result"] =
+    claim(
+      "full",
+      List("analytic", "topological"),
+      scope(
+        List("brep", "analytic-curve", "analytic-surface"),
+        List("brep"),
+        List("Owned analytic supports, face-local pcurves, and native trim intervals."),
+      ),
+      List(
+        "This is an exact-result representation contract, not a general exact-solid constructor.",
+      ),
+      "crates/axiolid-brep",
+      "The builder refuses unresolved supports and missing native trim spans.",
+    )
+  ["geometry.topology.manifold-validation"] =
+    claim(
+      "partial",
+      List("topological"),
+      scope(
+        List("brep"),
+        List("brep"),
+        List("Structural B-rep audit and closed-manifold health checks."),
+      ),
+      List(
+        "Geometric coincidence, containment, and self-intersection certification are unavailable.",
+      ),
+      "crates/axiolid-topology/src/audit.rs",
+      "Structural audit diagnostics are public; geometric validation is deliberately separate.",
+    )
+  ["geometry.tessellation.surface"] =
+    claim(
+      "partial",
+      List("tolerance-bounded", "approximate"),
+      scope(
+        List("analytic-surface", "brep"),
+        List("triangle-mesh"),
+        List(
+          "Supported curved B-rep faces with explicit tolerance and shared topological-edge reuse.",
+        ),
+      ),
+      List(
+        "Only supported surface and trim families are tessellated; failure is explicit rather than a fallback.",
+      ),
+      "crates/axiolid-tessellate",
+      "Tessellation is an explicit derived output with tolerance and watertight-edge invariants.",
+    )
+  ["geometry.boolean.union"] =
+    claim(
+      "partial",
+      List("approximate"),
+      scope(
+        List("triangle-mesh"),
+        List("triangle-mesh"),
+        List("Oriented, closed, manifold triangle meshes through the swappable boolmesh backend."),
+      ),
+      List("No exact analytic or B-rep Boolean claim; upstream backend resources are unbounded."),
+      "crates/axiolid-boolmesh",
+      "Input orientation/manifold checks and result-contract checks guard the mesh backend.",
+    )
+  ["geometry.boolean.intersection"] =
+    claim(
+      "partial",
+      List("approximate"),
+      scope(
+        List("triangle-mesh"),
+        List("triangle-mesh"),
+        List("Oriented, closed, manifold triangle meshes through the swappable boolmesh backend."),
+      ),
+      List("No exact analytic or B-rep Boolean claim; upstream backend resources are unbounded."),
+      "crates/axiolid-boolmesh",
+      "Input orientation/manifold checks and result-contract checks guard the mesh backend.",
+    )
+  ["geometry.boolean.difference"] =
+    claim(
+      "partial",
+      List("approximate"),
+      scope(
+        List("triangle-mesh"),
+        List("triangle-mesh"),
+        List("Oriented, closed, manifold triangle meshes through the swappable boolmesh backend."),
+      ),
+      List("No exact analytic or B-rep Boolean claim; upstream backend resources are unbounded."),
+      "crates/axiolid-boolmesh",
+      "Input orientation/manifold checks and result-contract checks guard the mesh backend.",
+    )
+  ["geometry.clearance.directional"] =
+    claim(
+      "partial",
+      List("approximate"),
+      scope(
+        List("triangle-mesh"),
+        List("layered-field"),
+        List("Frame-neutral sampled vertical clearance above or below a layered field."),
+      ),
+      List(
+        "Sampling resolution and explicit field tolerance bound the result; it is not a conservative all-geometry clearance proof.",
+      ),
+      "crates/axiolid-field/src/clearance.rs",
+      "Clearance is reported from explicitly sampled triangle-derived layered fields.",
+    )
+  ["geometry.construction.extrusion"] =
+    claim(
+      "partial",
+      List("approximate"),
+      scope(
+        List("profile"),
+        List("triangle-mesh"),
+        List("Validated planar profile extrusion with explicit mesh output."),
+      ),
+      List("Exact B-rep construction is a separate unavailable request path."),
+      "crates/axiolid-generate/src/extrude.rs",
+      "The current L2 extrusion API returns TriMesh.",
+    )
+  ["geometry.construction.revolution"] =
+    claim(
+      "partial",
+      List("approximate"),
+      scope(
+        List("profile"),
+        List("triangle-mesh"),
+        List("Validated profile revolution with explicit mesh output."),
+      ),
+      List("Exact B-rep construction is a separate unavailable request path."),
+      "crates/axiolid-generate/src/revolve.rs",
+      "The current L2 revolution API returns TriMesh.",
+    )
+  ["geometry.construction.loft"] =
+    claim(
+      "partial",
+      List("approximate"),
+      scope(
+        List("profile"),
+        List("triangle-mesh"),
+        List("Validated station-based profile lofting with explicit mesh output."),
+      ),
+      List("Exact B-rep construction is a separate unavailable request path."),
+      "crates/axiolid-generate/src/loft.rs",
+      "The current L2 loft API returns TriMesh.",
+    )
+  ["geometry.construction.sweep"] =
+    claim(
+      "partial",
+      List("approximate"),
+      scope(
+        List("profile", "analytic-curve"),
+        List("triangle-mesh"),
+        List(
+          "Supported fixed-reference and surface-curve profile sweeps with explicit mesh output.",
+        ),
+      ),
+      List(
+        "Unsupported analytic inversion and exact B-rep construction refuse rather than degrade silently.",
+      ),
+      "crates/axiolid-generate/src/sweep.rs",
+      "The current L2 sweep APIs return TriMesh and preserve explicit refusal paths.",
+    )
+  ["geometry.repair.diagnosis"] =
+    claim(
+      "partial",
+      List("topological"),
+      scope(
+        List("triangle-mesh"),
+        List("triangle-mesh"),
+        List("Explicit diagnosis of indexed triangle-mesh defects."),
+      ),
+      List("Diagnosis does not mutate geometry."),
+      "crates/axiolid-heal/src/mesh.rs",
+      "Mesh diagnosis returns structured defects before any opt-in repair.",
+    )
+  ["geometry.repair.explicit"] =
+    claim(
+      "partial",
+      List("approximate"),
+      scope(
+        List("triangle-mesh"),
+        List("triangle-mesh"),
+        List("Narrow caller-selected indexed triangle-mesh repair plans with audit reports."),
+      ),
+      List("There is no repair-all operation and every report records remaining defects."),
+      "crates/axiolid-heal/src/repair.rs",
+      "Repairs are explicit plans and return an audit report.",
+    )
+}

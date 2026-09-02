@@ -1,0 +1,10 @@
+/// Closed catalog of capability IDs standardized by openbim.geometry 0.1.
+module openbim.geometry.capabilities.catalog
+
+import "Operation.pkl" as operation
+import "Query.pkl" as query
+import "Representation.pkl" as representation
+import "Topology.pkl" as topology
+
+typealias CapabilityId =
+  representation.CapabilityId | query.CapabilityId | operation.CapabilityId | topology.CapabilityId

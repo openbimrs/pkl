@@ -86,11 +86,40 @@ pkl project package --output-path build packages/openbim.loin
 ```
 
 
+## `openbim.geometry`
+
+`openbim.geometry` is a vendor- and application-neutral geometry-kernel capability
+vocabulary. It keeps MCS/domain policy out of geometry declarations while letting
+kernels publish evidence-backed, scoped support claims and downstream tools state
+requirements. It covers representation, queries, Boolean/construction/editing,
+topology, tessellation, and explicit repair without treating a mesh, B-rep, or
+precision model as universal.
+
+A claim is only meaningful with its declared dimensions, input/output
+representations, supported cases, exactness/quality, limitations, and evidence.
+CGAL, OCCT, and Axiolid therefore need not be flattened into the same purported
+"exact geometry" capability.
+
+```pkl
+amends "@geometry/schema/Manifest.pkl"
+
+implementation {
+  id = "org.example.kernel"
+  name = "Example Kernel"
+  version = "1.2.3"
+}
+```
+
+See [`docs/geometry-capabilities.md`](docs/geometry-capabilities.md), the
+[Axiolid factual fixture](packages/openbim.geometry/conformance/axiolid.pkl),
+and the [analytic B-rep requirement example](packages/openbim.geometry/examples/requirements/analytic-brep.pkl).
+
 ## Status
 
 | Package | Version | Semantic model | XML codec |
 |---|---:|---|---|
 | `openbim.loin` | 0.1.0 | Implemented and tested | Not implemented |
+| `openbim.geometry` | 0.1.0 | Implemented and tested | Not applicable: capability vocabulary |
 
 See [`docs/loin-port.md`](docs/loin-port.md) for the audited port map and
 capability boundary.

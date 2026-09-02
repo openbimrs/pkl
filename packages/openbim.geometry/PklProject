@@ -1,0 +1,9 @@
+amends "pkl:Project"
+
+package {
+  name = "openbim.geometry"
+  baseUri = "package://openbimrs.github.io/pkl/openbim.geometry"
+  version = "0.1.0"
+  packageZipUrl =
+    "https://github.com/openbimrs/pkl/releases/download/openbim.geometry@0.1.0/openbim.geometry@0.1.0.zip"
+}

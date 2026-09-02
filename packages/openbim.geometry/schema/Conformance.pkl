@@ -1,0 +1,22 @@
+/// Declarative output contract for external manifest/requirement evaluators.
+module openbim.geometry.schema.conformance
+
+import "Requirements.pkl" as requirements
+
+/// The outcome is deliberately not a domain-policy verdict.
+typealias ConformanceStatus = "satisfied" | "unsatisfied" | "indeterminate"
+
+/// One externally evaluated capability requirement.
+class CapabilityAssessment {
+  requirement: requirements.CapabilityRequirement
+  status: ConformanceStatus
+  reason: String? = null
+}
+
+/// Machine-readable result of matching one manifest against one requirement profile.
+class ConformanceReport {
+  implementationId: String
+  implementationVersion: String
+  requirementsId: String
+  assessments: List<CapabilityAssessment> = List()
+}
