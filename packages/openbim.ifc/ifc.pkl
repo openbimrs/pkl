@@ -1,7 +1,8 @@
-/// Neutral, version-explicit references into IFC structural catalogs.
+/// Neutral, version-explicit references into delta-compressed IFC structural catalogs.
 module openbim.ifc
 
 typealias ReleaseId = "IFC2X3_TC1" | "IFC4_ADD2_TC1" | "IFC4X3_ADD2"
+typealias LifecycleChangeKind = "introduced" | "deprecated" | "removed" | "renamed" | "replaced"
 
 /// Exact identity and provenance boundary for one bundled IFC schema table.
 class Release {
@@ -11,23 +12,29 @@ class Release {
   entityCount: UInt
   typeCount: UInt
   sourceUri: String(startsWith("https://"))
-  /// Package-owned identifier for external names bound to this exact table.
-  catalogTypeSystem: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/"))
+  /// Release-bound IFC identifier. This is domain identity, never package transport.
+  externalTypeSystem: String(startsWith("https://"))
+  /// Package transport identity for this generated catalog release.
+  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.2.0#/"))
 }
 
-/// Structural facts for one entity row. Attributes are inherited-first and in
-/// Part 21 positional order; supertypes are nearest-parent first.
-class EntityDefinition {
-  supertypes: List<String>
+/// Physical storage fact: immediate parent and directly declared positional slots only.
+class DirectEntityDefinition {
+  parent: String?
   attributes: List<String>
 }
 
-/// Version-bound entity reference safe to lower into an authoring contract.
+/// Version-bound entity reference resolved from direct declarations at query time.
 class EntityReference {
   release: ReleaseId
-  catalogTypeSystem: String
+  externalTypeSystem: String(startsWith("https://"))
+  packageCatalogUri: String(startsWith("package://openbimrs.github.io/pkl/openbim.ifc@0.2.0#/"))
   name: String(matches(Regex(#"^Ifc[A-Za-z0-9_]+$"#)))
+  directSupertype: String?
+  directAttributes: List<String>
+  /// Reconstructed nearest-parent-first ancestry for this exact release.
   supertypes: List<String>
+  /// Reconstructed inherited-first Part 21 positional attributes for this exact release.
   attributes: List<String>
 }
 
@@ -37,21 +44,38 @@ class AttributeReference {
   name: String(entity.attributes.contains(this))
 }
 
-/// One explicit property-set template name. Structural catalogs do not claim
-/// full PSD coverage; this preserves the authored reference without inventing
-/// catalog membership.
-class PropertySetReference {
-  release: ReleaseId
-  catalogTypeSystem: String
-  name: String(matches(Regex(#"^Pset_[A-Za-z0-9_]+$"#)))
+/// Cross-release structural history for one canonical entity name.
+class EntityEvolution {
+  name: String(matches(Regex(#"^Ifc[A-Za-z0-9_]+$"#)))
+  definitions: Mapping<ReleaseId, DirectEntityDefinition>(isNotEmpty)
+  observedAddedIn: List<ReleaseId>
+  observedRemovedIn: List<ReleaseId>
+  lifecycleEvidence: List<LifecycleEvidence>
 }
 
-/// One explicit property-template name. Structural catalogs do not claim full
-/// PSD coverage: this reference preserves what the author supplied and never
-/// pretends that a name was verified against an unavailable template edition.
-class PropertyReference {
+/// Normative lifecycle fact with authoritative evidence.
+class LifecycleEvidence {
+  entity: String(matches(Regex(#"^Ifc[A-Za-z0-9_]+$"#)))
+  kind: LifecycleChangeKind
   release: ReleaseId
-  catalogTypeSystem: String
-  container: String(matches(Regex(#"^Pset_[A-Za-z0-9_]+$"#)))
-  name: String(matches(Regex(#"^[A-Za-z][A-Za-z0-9_]*$"#)))
+  sourceUri: String(startsWith("https://"))
+  target: String?
+}
+
+/// Typed extension boundary only. PSD/QTO occurrences must come from canonical
+/// ifc-template-catalog exports and continuity always requires explicit evidence.
+class TemplateCatalogExtensionBoundary {
+  exporter: "ifc-template-catalog"
+  status: "not-bundled"
+  occurrenceIdentity: "release-local"
+  continuityPolicy: "explicit-evidence-required"
+  sourceContract: "version-explicit-guid-bearing-tsv"
+}
+
+const templateCatalogExtension = new TemplateCatalogExtensionBoundary {
+  exporter = "ifc-template-catalog"
+  status = "not-bundled"
+  occurrenceIdentity = "release-local"
+  continuityPolicy = "explicit-evidence-required"
+  sourceContract = "version-explicit-guid-bearing-tsv"
 }

@@ -1,4 +1,4 @@
-/// Cross-version authoring example: one concept, three exact structural catalogs.
+/// Cross-version authoring example using release-bound delta reconstruction.
 module openbim.ifc.examples.basic
 
 import "../versions/Ifc2x3.pkl" as ifc2x3
@@ -8,9 +8,14 @@ import "../versions/Ifc4x3.pkl" as ifc4x3
 wall2x3 = ifc2x3.entity("IfcWall")
 wall4 = ifc4.entity("IfcWall")
 wall4x3 = ifc4x3.entity("IfcWall")
-loadBearing4x3 = ifc4x3.property("Pset_WallCommon", "LoadBearing")
 
 versionBoundary = new {
   ifc4BuildingSupertype = wall4.supertypes.first
   ifc4x3BuiltSupertype = wall4x3.supertypes.first
+  ifc4x3ExternalTypeSystem = wall4x3.externalTypeSystem
+  directWallAttributes = wall4x3.directAttributes
 }
+
+/// PSD/QTO is intentionally outside this structural package. Consume canonical
+/// typed template exports from the ifc-template-catalog exporter when available.
+templateCatalogExtensionBoundary = "canonical ifc-template-catalog exporter"

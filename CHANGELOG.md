@@ -4,17 +4,30 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 ## [Unreleased]
 
+### Added
+
+- Added `openbim.ifc` 0.2.0 with a delta-compressed IFC2X3 baseline,
+  IFC4/IFC4X3 direct-declaration deltas, one union resolver, thin version
+  imports, deterministic regeneration, and explicit observed-versus-normative
+  lifecycle boundaries.
+- Added a typed, not-yet-bundled PSD/QTO extension boundary: occurrences remain
+  release-local and cross-release continuity requires explicit evidence.
+- Added `openbim.ifc` 0.1.0 with exact IFC2X3 TC1, IFC4 ADD2 TC1, and
+  IFC4X3 ADD2 entity catalogs, inheritance closures, inherited attribute order,
+  explicit release references, deterministic provenance, and MCS-ready adapters.
+- Added `openbim.geometry` 0.1.0 with vendor-neutral capability IDs, scoped
+  manifests, requirements, and declarative conformance reports.
+
 ### Changed
 
 - Resolve and evaluate the published `openbim.loin@0.1.0` remote consumer in
   the repository gate.
 - Create the Pkl installation directory on fresh CI runners.
 
-### Added
-- Added `openbim.ifc` 0.1.0 with exact IFC2X3 TC1, IFC4 ADD2 TC1, and
-  IFC4X3 ADD2 entity catalogs, inheritance closures, inherited attribute order,
-  explicit release references, deterministic provenance, and MCS-ready adapters.
-- Added `openbim.geometry` 0.1.0: a vendor- and application-neutral geometry capability catalog, scoped implementation manifests, downstream requirements, and declarative conformance reports. The initial Axiolid manifest is source-evidenced and deliberately leaves unsupported exact construction, general intersections, minimum distance, and containment absent.
+### Removed
+
+- Removed `openbim.ifc`'s unverified free-form property-set/property helpers;
+  typed PSD/QTO references now wait for canonical `ifc-template-catalog` data.
 
 ## [0.1.0] - 2026-09-01
 

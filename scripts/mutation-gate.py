@@ -63,13 +63,63 @@ def main() -> None:
         ),
     )
     expect_rejected(
-        "ifc4x3-entity-name",
+        "ifc-release-identity",
         "openbim.ifc",
         "tests/ifc.pkl",
         lambda package: replace_once(
-            package / "versions/Ifc4x3.pkl",
-            '    | "IfcWall"\n',
-            '    | "IfcWall_BROKEN"\n',
+            package / "Catalog.pkl",
+            '  externalTypeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"',
+            '  externalTypeSystem = "package://broken-ifc-identity"',
+        ),
+    )
+    expect_rejected(
+        "ifc-resolver-guard",
+        "openbim.ifc",
+        "tests/ifc.pkl",
+        lambda package: replace_once(
+            package / "Catalog.pkl",
+            '  if (\n    !hasEntity("IFC2X3_TC1", name_)\n      && !hasEntity("IFC4_ADD2_TC1", name_)\n      && !hasEntity("IFC4X3_ADD2", name_)\n  )',
+            "  if (false)",
+        ),
+    )
+    expect_rejected(
+        "ifc-lifecycle-evidence",
+        "openbim.ifc",
+        "tests/ifc.pkl",
+        lambda package: replace_once(
+            package / "Catalog.pkl",
+            "normativeLifecycleEvidence: List<ifc.LifecycleEvidence> = List()",
+            'normativeLifecycleEvidence: List<ifc.LifecycleEvidence> = List(new ifc.LifecycleEvidence { entity = "IfcWall"; kind = "introduced"; release = "IFC4_ADD2_TC1"; sourceUri = "https://example.invalid/unsupported" })',
+        ),
+    )
+    expect_rejected(
+        "ifc-template-continuity-boundary",
+        "openbim.ifc",
+        "tests/ifc.pkl",
+        lambda package: replace_once(
+            package / "ifc.pkl",
+            '  continuityPolicy = "explicit-evidence-required"',
+            '  continuityPolicy = "name-equality"',
+        ),
+    )
+    expect_rejected(
+        "ifc-direct-declaration",
+        "openbim.ifc",
+        "tests/ifc.pkl",
+        lambda package: replace_once(
+            package / "Catalog.pkl",
+            '  ["IfcWall"] = new ifc.DirectEntityDefinition {\n    parent = "IfcBuildingElement"\n    attributes = List("PredefinedType")',
+            '  ["IfcWall"] = new ifc.DirectEntityDefinition {\n    parent = "IfcElement"\n    attributes = List("PredefinedType")',
+        ),
+    )
+    expect_rejected(
+        "ifc-release-membership",
+        "openbim.ifc",
+        "tests/ifc.pkl",
+        lambda package: replace_once(
+            package / "Catalog.pkl",
+            'ifc4x3Removed: List<String> =\n  List(\n    "IfcBeamStandardCase",\n    "IfcBuildingElement",\n    "IfcBuildingElementType",',
+            'ifc4x3Removed: List<String> =\n  List(\n    "IfcBeamStandardCase",\n    "IfcBuildingElementType",',
         ),
     )
 

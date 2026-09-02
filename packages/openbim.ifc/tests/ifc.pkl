@@ -1,10 +1,11 @@
-/// RED tests for version-separated IFC structural references.
+/// Tests for delta-compressed, release-bound IFC structural references.
 module openbim.ifc.tests
 
 amends "pkl:test"
 
 import "pkl:test" as test
 
+import "../Catalog.pkl" as catalog
 import "../ifc.pkl" as ifc
 import "../versions/Ifc2x3.pkl" as ifc2x3
 import "../versions/Ifc4.pkl" as ifc4
@@ -21,40 +22,79 @@ facts {
     ifc4x3.release.id == "IFC4X3_ADD2"
     ifc4x3.release.entityCount == 876
     ifc4x3.release.typeCount == 436
+    ifc2x3.entity("IfcWall").externalTypeSystem == ifc2x3.release.sourceUri
+    ifc4.entity("IfcWall").externalTypeSystem
+      == "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4"
   }
 
-  ["all catalog rows are present"] {
-    ifc2x3.entities.length == ifc2x3.release.entityCount
-    ifc4.entities.length == ifc4.release.entityCount
-    ifc4x3.entities.length == ifc4x3.release.entityCount
+  ["one union and exact direct declaration metrics"] {
+    catalog.entityNames.length == 1006
+    catalog.revisionCount == 1236
+    catalog.directDeclarationCount == 1236
   }
 
-  ["typed entity references preserve their release"] {
-    let (wall2x3 = ifc2x3.entity("IfcWall"))
-      wall2x3.release == "IFC2X3_TC1" && wall2x3.name == "IfcWall"
+  ["unified evolution preserves exact release membership"] {
+    let (history = catalog.evolution("IfcBuildingElement"))
+      history.definitions.containsKey("IFC2X3_TC1")
+        && history.definitions.containsKey("IFC4_ADD2_TC1")
+        && !history.definitions.containsKey("IFC4X3_ADD2")
+        && history.observedRemovedIn == List("IFC4X3_ADD2")
+        && history.lifecycleEvidence.isEmpty
+  }
+
+  ["release references retain https type identity and package transport separately"] {
+    let (reference = ifc4x3.entity("IfcWall"))
+      reference.release == "IFC4X3_ADD2"
+        && reference.externalTypeSystem
+          == "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+        && reference.packageCatalogUri.startsWith(
+          "package://openbimrs.github.io/pkl/openbim.ifc@0.2.0#/",
+        )
+    !ifc4x3.entity("IfcWall").externalTypeSystem.startsWith("package://")
+  }
+
+  ["thin release modules resolve version-specific structure"] {
+    ifc2x3.entity("IfcWall").release == "IFC2X3_TC1"
     ifc4.entity("IfcWall").release == "IFC4_ADD2_TC1"
     ifc4x3.entity("IfcWall").release == "IFC4X3_ADD2"
-  }
-
-  ["version-specific inheritance is not substituted"] {
     ifc4.entity("IfcWall").supertypes.contains("IfcBuildingElement")
     !ifc4.entity("IfcWall").supertypes.contains("IfcBuiltElement")
     ifc4x3.entity("IfcWall").supertypes.contains("IfcBuiltElement")
     !ifc4x3.entity("IfcWall").supertypes.contains("IfcBuildingElement")
   }
 
-  ["inherited positional attributes remain ordered"] {
+  ["reconstructed ancestry and Part 21 attributes are inherited-first"] {
     let (attributes = ifc4.entity("IfcWall").attributes)
       attributes[0] == "GlobalId"
         && attributes[1] == "OwnerHistory"
         && attributes[2] == "Name"
         && attributes[3] == "Description"
         && attributes.contains("PredefinedType")
+    ifc4.entity("IfcWall").directSupertype == "IfcBuildingElement"
+    ifc4.entity("IfcWall").directAttributes.contains("PredefinedType")
   }
 
-  ["unknown entities fail closed"] {
+  ["observed transitions are not normative lifecycle claims"] {
+    catalog.observedAdded("IFC4_ADD2_TC1").length == 237
+    catalog.observedRemoved("IFC4_ADD2_TC1").length == 114
+    catalog.observedAdded("IFC4X3_ADD2").length == 116
+    catalog.observedRemoved("IFC4X3_ADD2").length == 16
+    catalog.lifecycleEvidence.isEmpty
+  }
+
+  ["cross-version presence is exact and absent lookups fail closed"] {
+    catalog.entity("IFC4_ADD2_TC1", "IfcBuildingElement").name == "IfcBuildingElement"
+    test.catchOrNull(() -> catalog.entity("IFC4X3_ADD2", "IfcBuildingElement")) != null
     test.catchOrNull(() -> ifc4.entityByName("IfcDefinitelyNotAnEntity")) != null
+    test.catchOrNull(() -> catalog.evolutionByName("IfcDefinitelyNotAnEntity")) != null
     test.catchOrNull(() -> ifc4x3.entityByName("IfcBuildingElement")) != null
+  }
+
+  ["template extension stays release-local and evidence-gated"] {
+    ifc.templateCatalogExtension.status == "not-bundled"
+    ifc.templateCatalogExtension.occurrenceIdentity == "release-local"
+    ifc.templateCatalogExtension.continuityPolicy == "explicit-evidence-required"
+    ifc.templateCatalogExtension.sourceContract == "version-explicit-guid-bearing-tsv"
   }
 
   ["attribute references validate membership"] {
@@ -73,15 +113,5 @@ facts {
         }
       ).name
     ) != null
-  }
-
-  ["template references carry release and container explicitly"] {
-    let (property = ifc4x3.property("Pset_WallCommon", "LoadBearing"))
-      property.release == "IFC4X3_ADD2"
-        && property.container == "Pset_WallCommon"
-        && property.name == "LoadBearing"
-    let (propertySet = ifc4x3.propertySet("Pset_WallCommon"))
-      propertySet.release == "IFC4X3_ADD2"
-        && propertySet.name == "Pset_WallCommon"
   }
 }

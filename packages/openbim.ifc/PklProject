@@ -1,13 +1,13 @@
-/// Version-separated IFC structural catalogs derived from canonical ifc-schema artifacts.
+/// Delta-compressed, release-explicit IFC structural catalog.
 amends "pkl:Project"
 
 package {
   name = "openbim.ifc"
   baseUri = "package://openbimrs.github.io/pkl/openbim.ifc"
-  version = "0.1.0"
+  version = "0.2.0"
   packageZipUrl =
     "https://github.com/openbimrs/pkl/releases/download/openbim.ifc@\(version)/openbim.ifc@\(version).zip"
-  description = "Versioned Apple Pkl contracts for IFC structural schema references."
+  description = "Delta-compressed Apple Pkl contracts for release-bound IFC structural references."
   authors {
     "OpenBIM.rs contributors <openbimrs@users.noreply.github.com>"
   }

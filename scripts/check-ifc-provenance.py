@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = ROOT / "packages/openbim.ifc"
 PROVENANCE = PACKAGE / "provenance"
 CATALOGS = PROVENANCE / "catalogs"
-VERSIONS = PACKAGE / "versions"
+GENERATED = (PACKAGE / "Catalog.pkl", *(PACKAGE / "versions").glob("*.pkl"))
 
 
 def fail(message: str) -> None:
@@ -73,12 +73,12 @@ def main() -> None:
             stdout=subprocess.DEVNULL,
         )
         subprocess.run([pkl, "format", "-w", str(rendered)], check=True)
-        for expected in sorted(VERSIONS.glob("*.pkl")):
+        for expected in sorted(GENERATED):
             candidate = rendered / expected.name
             if not candidate.is_file() or candidate.read_bytes() != expected.read_bytes():
                 fail(f"generated catalog drift: {expected.name}")
         extras = {path.name for path in rendered.glob("*.pkl")} - {
-            path.name for path in VERSIONS.glob("*.pkl")
+            path.name for path in GENERATED
         }
         if extras:
             fail(f"unexpected generated catalogs: {sorted(extras)}")

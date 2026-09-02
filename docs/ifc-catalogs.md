@@ -1,54 +1,51 @@
 # IFC structural catalogs
 
-`openbim.ifc` is a version-separated Apple Pkl package for authoring references
-to IFC schema structure. It covers the exact bundled releases used by
-`openbimrs/ifc`:
+`openbim.ifc` is a release-explicit Apple Pkl package for authoring references to IFC schema structure. Version `0.2.0` covers the exact bundled releases used by `openbimrs/ifc`:
 
-| Module | Release | Entities | Defined types |
+| Entry point | Release | Entities | Defined types |
 |---|---|---:|---:|
 | `versions/Ifc2x3.pkl` | IFC2X3 TC1 | 653 | 327 |
 | `versions/Ifc4.pkl` | IFC4 ADD2 TC1 | 776 | 397 |
 | `versions/Ifc4x3.pkl` | IFC4X3 ADD2 | 876 | 436 |
 
-Each version module exposes:
+The three entry points are thin views over one delta-compressed catalog:
 
-- a closed `EntityName` union;
-- a deterministic entity map with complete supertype closure and inherited
-  positional attribute order;
-- `entity` for statically checked names and `entityByName` for fail-closed
-  dynamic lookup;
-- version-bound attribute, property-set, and property references.
+- one 1,006-name `EntityName` union catches unknown spellings;
+- IFC2X3 stores the baseline direct declarations;
+- IFC4 and IFC4X3 store only additions, removals, and changed direct declarations;
+- ancestry and inherited-first Part 21 attributes are reconstructed for the selected release;
+- `entity` and `entityByName` fail closed when a known name is absent from that release;
+- every result retains its exact release, HTTPS external type-system identity, and separate package transport URI.
 
 ```pkl
 import "@ifc/versions/Ifc4x3.pkl" as ifc4x3
 
 wall = ifc4x3.entity("IfcWall")
-loadBearing = ifc4x3.property("Pset_WallCommon", "LoadBearing")
+amendedSupertype = wall.directSupertype
+inheritedSlots = wall.attributes
 ```
+
+`Catalog.pkl` also exposes exact observed additions and removals between the supported snapshots. Those differences are not presented as normative introduction, deprecation, rename, or replacement claims. Such lifecycle claims require separately sourced `LifecycleEvidence` records.
 
 ## Provenance boundary
 
-The structural rows are deterministically generated from the bundled
-`ifc-schema` artifacts in `openbimrs/ifc`, not transcribed in Pkl. The package
-tracks the neutral TSV exports and their SHA-256 digests under
-`packages/openbim.ifc/provenance/`; they are excluded from the package ZIP.
-`NOTICE` records the exact artifact commit and buildingSMART attribution.
+Direct structural rows are deterministically exported from the bundled `ifc-schema` artifacts in `openbimrs/ifc`; Pkl does not infer declarations from specification prose. Each TSV row contains only an entity name, immediate parent, and directly declared positional slots. The canonical Rust export tests reconstruct every expanded release row exactly.
 
-The catalog contains structural facts only. It does not redistribute EXPRESS,
-XSD, specification prose, diagrams, or a complete PSD/QTO template catalog.
-Consequently `propertySet` and `property` preserve explicit version-bound names
-but do **not** claim that those names were verified against a bundled template
-edition. Entity and inherited-attribute references are catalog-validated.
+The package pins artifact/exporter commits and SHA-256 digests under `packages/openbim.ifc/provenance/`. Frozen TSV evidence is excluded from the package ZIP. `NOTICE` records buildingSMART attribution.
+
+The catalog contains structural facts only. It does not redistribute EXPRESS, XSD, prose, diagrams, or PSD/QTO XML.
+
+## PSD/QTO extension boundary
+
+Version `0.2.0` intentionally removes the unverified free-form `propertySet` and `property` helpers from `0.1.0`. They made names release-bound but could not prove that a set/member existed in the selected template edition.
+
+Typed property-set and quantity-set evolution must come from deterministic exports owned by the canonical Rust `ifc-template-catalog`. The typed extension boundary fixes occurrence identity as release-local and requires explicit continuity evidence; shared names or GUIDs are candidates, not proof. Snapshot presence and normative lifecycle evidence remain distinct. Until package-owned runtime references are bundled, downstream consumers must omit IFC template identity claims rather than substitute local strings; MCS must never define its own IFC template schema.
 
 ## Boundary with MCS and geometry
 
-- IFC owns release identities, entity names, inheritance, attributes, and
-  external template-reference encoding.
-- `openbim.geometry` owns kernel capability IDs, exactness, requirements, and
-  scoped conformance.
-- Axioval MCS owns rules, applicability, parameters, citations, and normalized
-  transport. Its adapters lower package-owned references without copying either
-  catalog.
+- IFC owns release identity, structural names, declarations, and eventually typed template catalogs.
+- `openbim.geometry` owns exact atomic geometry capability identifiers.
+- Axioval MCS owns normalized rules, applicability, parameters, and citations.
+- MCS adapters lower package-owned values without copying either specialized catalog.
 
-This keeps schema facts and geometric capabilities out of rule packages while
-preserving version and scope information at the authoring boundary.
+Package transport URIs identify where Pkl code is fetched. They are never emitted as the normalized external IFC type system.

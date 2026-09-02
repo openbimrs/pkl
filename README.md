@@ -88,20 +88,23 @@ pkl project package --output-path build packages/openbim.loin
 
 ## `openbim.ifc`
 
-`openbim.ifc` provides version-separated structural catalogs for IFC2X3 TC1,
-IFC4 ADD2 TC1, and IFC4X3 ADD2. Entity names are closed Pkl unions; dynamic
-lookups fail closed; each entity carries its complete supertype closure and
-inherited positional attribute order. The generated rows come from exact
-`openbimrs/ifc` `ifc-schema` artifacts rather than MCS-authored strings.
+`openbim.ifc` provides one delta-compressed, release-explicit structural catalog
+for IFC2X3 TC1, IFC4 ADD2 TC1, and IFC4X3 ADD2. Thin version entry points
+reconstruct ancestry and inherited positional slots from direct declarations;
+unknown or release-absent entities fail closed. Canonical rows come from exact
+`openbimrs/ifc` `ifc-schema` exports rather than MCS-authored strings.
 
 ```pkl
 import "@ifc/versions/Ifc4x3.pkl" as ifc4x3
 
 wall = ifc4x3.entity("IfcWall")
-loadBearing = ifc4x3.property("Pset_WallCommon", "LoadBearing")
+inheritedSlots = wall.attributes
 ```
 
-The package deliberately does not claim complete PSD/QTO coverage. See
+The package deliberately does not bundle PSD/QTO runtime data in `0.2.0`.
+The canonical `ifc-template-catalog` now supplies version-explicit, GUID-bearing
+exports; this package fixes their release-local occurrence and evidence-required
+continuity boundary for later measured ingestion. See
 [`docs/ifc-catalogs.md`](docs/ifc-catalogs.md) for provenance and the boundary
 with `openbim.geometry` and Axioval MCS.
 
@@ -138,7 +141,7 @@ and the [analytic B-rep requirement example](packages/openbim.geometry/examples/
 | Package | Version | Semantic model | XML codec |
 |---|---:|---|---|
 | `openbim.loin` | 0.1.0 | Implemented and tested | Not implemented |
-| `openbim.ifc` | 0.1.0 | IFC2X3, IFC4, and IFC4X3 structural catalogs | Not applicable: schema-as-data |
+| `openbim.ifc` | 0.2.0 | Delta-compressed IFC2X3, IFC4, and IFC4X3 structural catalog | Not applicable: schema-as-data |
 | `openbim.geometry` | 0.1.0 | Implemented and tested | Not applicable: capability vocabulary |
 
 See [`docs/loin-port.md`](docs/loin-port.md) for the audited port map and

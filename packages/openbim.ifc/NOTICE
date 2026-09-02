@@ -1,12 +1,13 @@
-openbim.ifc 0.1.0 includes generated structural catalogs for IFC2x3 TC1,
+openbim.ifc 0.2.0 includes generated structural catalogs for IFC2x3 TC1,
 IFC4 ADD2 TC1, and IFC4X3 ADD2.
 
 Repository-authored Pkl contracts and tooling are licensed under
 AGPL-3.0-or-later. The generated catalog rows are deterministic format shifts
-of structural schema facts (entity names, ancestry, and inherited positional
-attribute names) from the compiled `ifc-schema` artifacts at openbimrs/ifc
+of structural schema facts (entity names, immediate parents, and directly
+declared attribute names) from the compiled `ifc-schema` artifacts at
+openbimrs/ifc
 commit a7c4949bb941504ce874bdec13bd81d33491b5cb. Catalogs were exported
-with `ifc-schema` commit 30b060f8dd7d3ceabfae3d4cd774fd7592d76f0f. No EXPRESS source or
+with `ifc-schema` commit a97e8f7e646407d6a4263a664631a1877dfa2986. No EXPRESS source or
 specification prose is included.
 
 Sources:
@@ -15,9 +16,9 @@ Sources:
 - IFC4X3 ADD2: https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/
 
 Structural TSV digests:
-- IFC2x3 TC1: 516beaf08c1e1afe84ee415a4fa84c86bccfc6eece1fc625b67b85acd9a565b4
-- IFC4 ADD2 TC1: 2c97230d1a25411c12e7cd3fbbfd656f13334007b3409fb6f16a1fb37e3344a1
-- IFC4X3 ADD2: 97702f639e69e18b475090cbd531b1916da99acfb1b744cfbfd9e47638dc7653
+- IFC2x3 TC1: 8c89a84de9c603e9dfe713aa3f89f86347972cdaaefbf0a723137ef1c280d746
+- IFC4 ADD2 TC1: 51109c3295ecb17a38f8efdeca66bbd79d9d961719b20ba99888888b179ce5f6
+- IFC4X3 ADD2: b00744442087c969f321550b3dcea7e49e0834ca001a4700ea5459e36eb56f12
 
 Upstream IFC names and schema structure are copyright buildingSMART
 International Limited and distributed under CC BY-ND 4.0. The format shift does
